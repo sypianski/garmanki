@@ -1,7 +1,7 @@
 <strings>
     <string id="AppName">Garmanki</string>
     <!-- Keep in sync with the version entered in the Connect IQ Store form. -->
-    <string id="AppVersion">0.1.8</string>
+    <string id="AppVersion">0.1.9</string>
 
     <string id="HomeDecks">Decks</string>
     <string id="HomeDue">due</string>
@@ -48,6 +48,7 @@
     <string id="SyncNoPhone">Open Garmanki on your phone</string>
     <string id="SyncApplied">Deck updated</string>
     <string id="SyncAnswersOk">Answers delivered</string>
+    <string id="SyncNever">Not synced yet</string>
     <string id="SyncJustNow">Synced just now</string>
     <string id="SyncYesterday">Yesterday</string>
     <string id="SyncedAt">Synced</string>

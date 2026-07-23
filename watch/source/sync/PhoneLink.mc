@@ -2,7 +2,6 @@ import Toybox.Lang;
 import Toybox.Communications;
 import Toybox.System;
 import Toybox.Time;
-import Toybox.Timer;
 import Toybox.WatchUi;
 import Toybox.Application.Storage;
 
@@ -47,26 +46,18 @@ class PhoneLink {
     private var _sentMs = 0;
 
     public var status as String = "";
-    private var _statusTimer as Timer.Timer? = null;
+    public var statusSetMs as Number = 0;
 
     function initialize() {
     }
 
-    // Show a transient status message; auto-clears after 5 s so the sync
-    // time takes over on the home screen.
+    // Transient status: shown for STATUS_TTL_MS, then ignored on next
+    // onUpdate() — avoids Timer which may be suspended on screen-off.
+    const STATUS_TTL_MS = 5000;
+
     function setStatus(s as String) as Void {
         status = s;
-        WatchUi.requestUpdate();
-        if (_statusTimer != null) {
-            (_statusTimer as Timer.Timer).stop();
-        }
-        _statusTimer = new Timer.Timer();
-        (_statusTimer as Timer.Timer).start(method(:_clearStatus), 5000, false);
-    }
-
-    function _clearStatus() as Void {
-        status = "";
-        _statusTimer = null;
+        statusSetMs = System.getTimer();
         WatchUi.requestUpdate();
     }
 

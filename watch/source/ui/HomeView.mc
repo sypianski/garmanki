@@ -1,5 +1,6 @@
 import Toybox.Lang;
 import Toybox.Graphics;
+import Toybox.System;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
 import Toybox.WatchUi;
@@ -94,18 +95,24 @@ class HomeView extends WatchUi.View {
                 Graphics.TEXT_JUSTIFY_CENTER);
         }
 
-        var status = Link.get().status;
-        if (status.length() > 0) {
+        var link = Link.get();
+        var status = link.status;
+        // Treat status as expired after STATUS_TTL_MS, even without a timer
+        // firing — avoids relying on Garmin's potentially-suspended timers.
+        var statusFresh = status.length() > 0
+            && (System.getTimer() - link.statusSetMs) < link.STATUS_TTL_MS;
+        if (statusFresh) {
             dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 72 / 100, Graphics.FONT_XTINY, status,
                 Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             var syncT = CardStore.getLastSyncTime();
-            if (syncT instanceof Number) {
-                dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cx, h * 72 / 100, Graphics.FONT_XTINY,
-                    _syncLine(syncT as Number), Graphics.TEXT_JUSTIFY_CENTER);
-            }
+            dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 72 / 100, Graphics.FONT_XTINY,
+                syncT instanceof Number
+                    ? _syncLine(syncT as Number)
+                    : (WatchUi.loadResource(Rez.Strings.SyncNever) as String),
+                Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         Theme.tick(dc, Theme.ANG_START, Theme.ACCENT);
