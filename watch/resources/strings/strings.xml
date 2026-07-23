@@ -51,4 +51,5 @@
     <string id="SyncJustNow">Synced just now</string>
     <string id="SyncYesterday">Yesterday</string>
     <string id="SyncedAt">Synced</string>
+    <string id="SyncVersionMismatch">Update Garmanki on both devices</string>
 </strings>

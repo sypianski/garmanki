@@ -26,6 +26,13 @@ data class WatchCard(
 /** Builds the chunked state push of SCHEMA.md §4. */
 object StatePayload {
 
+    /**
+     * Protocol/contract version — SCHEMA.md §1. Advertised in state-push
+     * seq:1 and compared by the watch against its own; bump only on a
+     * non-backward-compatible change to the contract.
+     */
+    const val PROTOCOL_VERSION = 1
+
     /** Keep each BLE message well under the ~16 KB practical payload limit. */
     const val MAX_CHUNK_CHARS = 10_000
     const val MAX_CARDS_PER_CHUNK = 60
@@ -78,6 +85,7 @@ object StatePayload {
                 "cards" to group,
             )
             if (i == 0) {
+                chunk["pv"] = PROTOCOL_VERSION // SCHEMA.md §1
                 chunk["decks"] = decksPayload
                 chunk["stats"] = statsPayload
                 if (cfg != null) chunk["cfg"] = cfg // SCHEMA.md §8

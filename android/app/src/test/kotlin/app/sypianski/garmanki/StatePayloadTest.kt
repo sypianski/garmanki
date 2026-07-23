@@ -95,6 +95,16 @@ class StatePayloadTest {
     }
 
     @Test
+    fun `protocol version rides on the first chunk only`() {
+        val chunks = StatePayload.buildChunks(
+            listOf(deck(0)), List(200) { card(it) }, 0, 0, rev = 9,
+        )
+        assertTrue(chunks.size > 1)
+        assertEquals(StatePayload.PROTOCOL_VERSION, chunks[0]["pv"])
+        chunks.drop(1).forEach { assertNull(it["pv"]) }
+    }
+
+    @Test
     fun `next times always padded to four`() {
         val c = WatchCard("1:0", "1", 0, 0, "f", "b", listOf("10 min"))
         val chunks = StatePayload.buildChunks(listOf(deck(0)), listOf(c), 0, 0, rev = 1)

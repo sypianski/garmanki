@@ -45,7 +45,8 @@ enum class PushFailure { NO_TARGET, SEND, ACK_TIMEOUT, NACK, SDK, BUSY }
 
 /** Messages the watch sends us — SCHEMA.md §3. */
 sealed interface WatchMessage {
-    data class Hello(val rev: Int?, val pend: Int) : WatchMessage
+    /** `pv` = watch's protocol/contract version (SCHEMA.md §1); null if omitted. */
+    data class Hello(val rev: Int?, val pend: Int, val pv: Int? = null) : WatchMessage
     data class Answers(
         val batch: Int,
         val ans: List<List<Any?>>,
@@ -107,7 +108,11 @@ class CiqManager(private val appContext: Context) : CiqLink {
         }
         when (map["t"]) {
             "h" -> _messages.tryEmit(
-                WatchMessage.Hello(rev = asInt(map["rev"]), pend = asInt(map["pend"]) ?: 0)
+                WatchMessage.Hello(
+                    rev = asInt(map["rev"]),
+                    pend = asInt(map["pend"]) ?: 0,
+                    pv = asInt(map["pv"]),
+                )
             )
             "a" -> {
                 val batch = asInt(map["batch"]) ?: return
