@@ -1,0 +1,49 @@
+<strings>
+    <string id="AppName">Garmanki</string>
+    <!-- Keep in sync with the version entered in the Connect IQ Store form. -->
+    <string id="AppVersion">0.1.6</string>
+
+    <string id="HomeDecks">Decks</string>
+    <string id="HomeDue">due</string>
+    <string id="HomePending">queued answers</string>
+    <string id="HomeNoData">No data — open the Garmanki app on your phone</string>
+
+    <string id="MenuDecksTitle">Decks</string>
+    <string id="DeckEmpty">Done for today</string>
+
+    <!-- Grade words, used by the onboarding guide (GAR-03). -->
+    <string id="WordAgain">again</string>
+    <string id="WordHard">hard</string>
+    <string id="WordGood">good</string>
+    <string id="WordEasy">easy</string>
+
+    <!-- Onboarding guide (GAR-03). -->
+    <string id="GuideTitle">Guide</string>
+    <string id="GuideT1">Show</string>
+    <string id="GuideT2">Grade</string>
+    <string id="GuideT3">Touch</string>
+    <string id="GuideT4">More</string>
+    <string id="Guide1">Any button or a tap reveals the answer</string>
+    <string id="Guide2">Buttons grade the card</string>
+    <string id="Guide4">Hold UP for suspend, bury, flag, delete. BACK ends the session.</string>
+    <string id="GuideDone">START to finish</string>
+    <string id="HomeStreak">day streak</string>
+
+    <string id="EaseAgain">Again</string>
+    <string id="EaseHard">Hard</string>
+    <string id="EaseGood">Good</string>
+    <string id="EaseEasy">Easy</string>
+    <string id="ActSuspend">Suspend</string>
+    <string id="ActBury">Bury</string>
+    <string id="ActFlag">Flag</string>
+    <string id="ActDelete">Delete</string>
+    <string id="Flagged">Flagged</string>
+
+    <string id="SummaryTitle">Session done</string>
+    <string id="SummaryCards">cards</string>
+    <string id="SummaryQueued">queued to sync</string>
+
+    <string id="SyncSent">Sync requested</string>
+    <string id="SyncApplied">Deck updated</string>
+    <string id="SyncAnswersOk">Answers delivered</string>
+</strings>

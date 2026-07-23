@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window/splash background + logo stroke; overridden in values-night. -->
+    <color name="garmanki_window_bg">#FFF9F9FC</color>
+    <color name="garmanki_logo">#FF44474F</color>
+
+    <style name="Theme.Garmanki" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/garmanki_window_bg</item>
+        <item name="android:statusBarColor">@color/garmanki_window_bg</item>
+        <item name="android:navigationBarColor">@color/garmanki_window_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Launch theme: compat splash for API 26-30, overridden by the v31
+         variant on Android 12+. -->
+    <style name="Theme.Garmanki.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/garmanki_window_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.Garmanki</item>
+    </style>
+</resources>

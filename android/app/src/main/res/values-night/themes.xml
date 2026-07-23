@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="garmanki_window_bg">#FF141317</color>
+    <color name="garmanki_logo">#FFE5EAF3</color>
+
+    <style name="Theme.Garmanki" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/garmanki_window_bg</item>
+        <item name="android:statusBarColor">@color/garmanki_window_bg</item>
+        <item name="android:navigationBarColor">@color/garmanki_window_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

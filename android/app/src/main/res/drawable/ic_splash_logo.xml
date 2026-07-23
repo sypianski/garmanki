@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Splash icon: samo logo na przezroczystym tle (splash bg =
+     @color/garmanki_window_bg, kolor kreski = @color/garmanki_logo,
+     oba z wariantem night). Kształt logo mieści się z zapasem wewnątrz
+     okrągłej maski systemowej splasha Androida 12+ (canvas 288dp,
+     widoczna maska ~192dp) — maska nie tnie żadnych widocznych pikseli. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="@color/garmanki_logo"
+        android:strokeWidth="3.4"
+        android:strokeLineCap="square"
+        android:strokeLineJoin="miter"
+        android:pathData="M 46,78 L 46,30 L 78,30 L 78,62 L 30,62 L 30,46 L 62,46 L 62,78 Z" />
+</vector>

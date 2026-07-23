@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Garmanki</string>
+
+    <string name="watch_section">Watch</string>
+    <string name="watch_sdk_error">Connect IQ error: %1$s</string>
+    <string name="watch_initializing">Connecting to Garmin Connect…</string>
+    <string name="watch_no_devices">No Garmin watch paired</string>
+    <string name="watch_app_missing">Garmanki is not installed on the watch</string>
+    <string name="watch_disconnected">disconnected</string>
+    <string name="watch_connected">connected</string>
+
+    <string name="anki_section">AnkiDroid</string>
+    <string name="anki_missing">AnkiDroid is not installed</string>
+    <string name="anki_no_permission">Access to the AnkiDroid database is required</string>
+    <string name="anki_grant">Grant access</string>
+
+    <string name="decks_section">Decks to sync</string>
+    <string name="decks_none">No decks found</string>
+    <string name="decks_select_all">Select all</string>
+    <string name="deck_due_counts">%1$d new · %2$d learning · %3$d review</string>
+    <string name="card_limit">Cards per deck: %1$d</string>
+
+    <string name="send_to_watch">Send to watch</string>
+    <string name="push_sending">Sending %1$d/%2$d…</string>
+    <string name="push_waiting_ack">Waiting for the watch…</string>
+    <string name="push_done">Sent (rev %1$d)</string>
+    <string name="push_failed">Send failed: %1$s</string>
+    <string name="push_skipped_cards">%1$d cards skipped (no text after HTML cleanup)</string>
+
+    <string name="stats_today">Today: %1$d</string>
+    <string name="stats_streak">Streak: %1$d days</string>
+
+    <string name="custom_study_hint">Out of cards? Increase today\'s limits with Custom study in AnkiDroid.</string>
+    <string name="open_ankidroid">Open AnkiDroid</string>
+
+    <string name="answers_applied">Applied %1$d answers from the watch (%2$d stale)</string>
+
+    <string name="controls_section">Watch controls</string>
+    <string name="controls_save">Save mapping</string>
+    <string name="controls_reset">Defaults</string>
+    <string name="controls_need_grades">Mapping must include both Again and Good</string>
+    <string name="controls_actions_hint">Card actions available in the watch menu:</string>
+    <string name="controls_guide">Show the guide again</string>
+</resources>
