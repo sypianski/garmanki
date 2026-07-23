@@ -35,14 +35,9 @@ class HomeView extends WatchUi.View {
         dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 12 / 100, Graphics.FONT_XTINY,
             Theme.spaced("Garmanki"), Graphics.TEXT_JUSTIFY_CENTER);
-        var vStr = "v" + (WatchUi.loadResource(Rez.Strings.AppVersion) as String);
-        var syncT = CardStore.getLastSyncTime();
-        if (syncT instanceof Number) {
-            var info = Gregorian.info(new Time.Moment(syncT), Time.FORMAT_SHORT);
-            vStr += " · " + info.hour.format("%02d") + ":" + info.min.format("%02d");
-        }
         dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 89 / 100, Graphics.FONT_XTINY, vStr,
+        dc.drawText(cx, h * 89 / 100, Graphics.FONT_XTINY,
+            "v" + (WatchUi.loadResource(Rez.Strings.AppVersion) as String),
             Graphics.TEXT_JUSTIFY_CENTER);
 
         if (decks.size() == 0) {
@@ -53,7 +48,7 @@ class HomeView extends WatchUi.View {
                 :locX => w / 6,
                 :locY => h * 34 / 100,
                 :width => w * 2 / 3,
-                :height => h * 36 / 100,
+                :height => h * 30 / 100,
                 :justification => Graphics.TEXT_JUSTIFY_CENTER
             });
             ta.draw(dc);
@@ -104,9 +99,40 @@ class HomeView extends WatchUi.View {
             dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 72 / 100, Graphics.FONT_XTINY, status,
                 Graphics.TEXT_JUSTIFY_CENTER);
+        } else {
+            var syncT = CardStore.getLastSyncTime();
+            if (syncT instanceof Number) {
+                dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
+                dc.drawText(cx, h * 72 / 100, Graphics.FONT_XTINY,
+                    _syncLine(syncT as Number), Graphics.TEXT_JUSTIFY_CENTER);
+            }
         }
 
         Theme.tick(dc, Theme.ANG_START, Theme.ACCENT);
+    }
+
+    private function _syncLine(syncT as Number) as String {
+        var nowSecs = Time.now().value();
+        var diff = nowSecs - syncT;
+        if (diff < 300) {
+            return WatchUi.loadResource(Rez.Strings.SyncJustNow) as String;
+        }
+        var si = Gregorian.info(new Time.Moment(syncT), Time.FORMAT_SHORT);
+        var timeStr = si.hour.format("%02d") + ":" + si.min.format("%02d");
+        var daysDiff = (nowSecs / 86400) - (syncT / 86400);
+        if (daysDiff == 0) {
+            return (WatchUi.loadResource(Rez.Strings.SyncedAt) as String) + " " + timeStr;
+        }
+        if (daysDiff == 1) {
+            return (WatchUi.loadResource(Rez.Strings.SyncYesterday) as String) + " " + timeStr;
+        }
+        if (daysDiff <= 7) {
+            var dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            return dow[(si.day_of_week as Number) - 1] + " " + timeStr;
+        }
+        var mon = ["Jan","Feb","Mar","Apr","May","Jun",
+                   "Jul","Aug","Sep","Oct","Nov","Dec"];
+        return si.day.toString() + " " + mon[(si.month as Number) - 1] + " " + timeStr;
     }
 }
 
@@ -123,8 +149,7 @@ class HomeDelegate extends WatchUi.BehaviorDelegate {
 
     function onMenu() as Boolean {
         Link.get().hello();
-        Link.get().status = WatchUi.loadResource(Rez.Strings.SyncSent) as String;
-        WatchUi.requestUpdate();
+        Link.get().setStatus(WatchUi.loadResource(Rez.Strings.SyncSent) as String);
         return true;
     }
 }

@@ -15,6 +15,9 @@ module DeckMenu {
                 : WatchUi.loadResource(Rez.Strings.DeckEmpty) as String;
             menu.addItem(new WatchUi.MenuItem(d[2], sub, d[0], null));
         }
+        menu.addItem(new WatchUi.MenuItem(
+            WatchUi.loadResource(Rez.Strings.MenuSyncTitle) as String,
+            null, "sync", null));
         // Re-run the first-launch guide on demand (GAR-03).
         menu.addItem(new WatchUi.MenuItem(
             WatchUi.loadResource(Rez.Strings.GuideTitle) as String,
@@ -31,6 +34,12 @@ class DeckMenuDelegate extends WatchUi.Menu2InputDelegate {
 
     function onSelect(item as WatchUi.MenuItem) as Void {
         var deckIdx = item.getId();
+        if ("sync".equals(deckIdx)) {
+            WatchUi.popView(WatchUi.SLIDE_RIGHT);
+            Link.get().hello();
+            Link.get().setStatus(WatchUi.loadResource(Rez.Strings.SyncSent) as String);
+            return;
+        }
         if ("guide".equals(deckIdx)) {
             WatchUi.pushView(new OnboardingView(false), new OnboardingDelegate(),
                 WatchUi.SLIDE_LEFT);

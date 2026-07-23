@@ -2,6 +2,7 @@ import Toybox.Lang;
 import Toybox.Communications;
 import Toybox.System;
 import Toybox.Time;
+import Toybox.Timer;
 import Toybox.WatchUi;
 import Toybox.Application.Storage;
 
@@ -43,8 +44,27 @@ class PhoneLink {
     private var _sentMs = 0;
 
     public var status as String = "";
+    private var _statusTimer as Timer.Timer? = null;
 
     function initialize() {
+    }
+
+    // Show a transient status message; auto-clears after 5 s so the sync
+    // time takes over on the home screen.
+    function setStatus(s as String) as Void {
+        status = s;
+        WatchUi.requestUpdate();
+        if (_statusTimer != null) {
+            (_statusTimer as Timer.Timer).stop();
+        }
+        _statusTimer = new Timer.Timer();
+        (_statusTimer as Timer.Timer).start(method(:_clearStatus), 5000, false);
+    }
+
+    function _clearStatus() as Void {
+        status = "";
+        _statusTimer = null;
+        WatchUi.requestUpdate();
     }
 
     function onMessage(msg as Communications.PhoneAppMessage) as Void {
@@ -110,11 +130,10 @@ class PhoneLink {
         if (d["ok"] == true) {
             CardStore.dropFirst(_sentCount);
             CardStore.bumpBatch();
-            status = WatchUi.loadResource(Rez.Strings.SyncAnswersOk) as String;
+            setStatus(WatchUi.loadResource(Rez.Strings.SyncAnswersOk) as String);
         }
         _sentBatch = null;
         _sentCount = 0;
-        WatchUi.requestUpdate();
         flush(); // rows queued while the batch was in flight, if any
     }
 
@@ -179,9 +198,8 @@ class PhoneLink {
         CardStore.replaceAll(decks, all, stats, rev);
         CardStore.setLastSyncTime(Time.now().value());
         _applyCfg(cfg);
-        status = WatchUi.loadResource(Rez.Strings.SyncApplied) as String;
+        setStatus(WatchUi.loadResource(Rez.Strings.SyncApplied) as String);
         _ack(rev, true, null);
-        WatchUi.requestUpdate();
     }
 
     // SCHEMA.md §8: sticky watch-UI config riding on chunk seq:1. Each part
@@ -229,17 +247,22 @@ class PhoneLink {
     }
 
     private function _tx(payload as Dictionary) as Void {
-        Communications.transmit(payload, null, new TxListener());
+        Communications.transmit(payload, null, new TxListener(self));
     }
 }
 
 class TxListener extends Communications.ConnectionListener {
-    function initialize() {
+    private var _link as PhoneLink;
+
+    function initialize(link as PhoneLink) {
         ConnectionListener.initialize();
+        _link = link;
     }
+
     function onComplete() as Void {
     }
+
     function onError() as Void {
-        // lost transmit — hello/flush are re-triggered by user actions
+        _link.setStatus(WatchUi.loadResource(Rez.Strings.SyncNoPhone) as String);
     }
 }
