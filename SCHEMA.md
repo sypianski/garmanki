@@ -9,6 +9,17 @@ Watch app UUID: `b1b0cef8a5b246af9c8ea2951c2d6bba`.
 
 - Protocol marker `p:1` on every message. Consumers MUST ignore messages
   with an unknown `p`.
+- Handshake carries `pv` — the **protocol/contract version** of this
+  document (currently `1`). The watch sends it in `hello` (§3); the
+  companion echoes its own in state-push `seq:1` (§4). `pv` is distinct
+  from `p`: `p` is a per-message envelope gate, `pv` lets each side detect
+  that the peer implements a different contract revision and warn the user.
+  A mismatch is a *soft* signal — both sides SHOULD still attempt to
+  interoperate (forward-compat rides on short keys + ignore-unknown).
+  Bump `pv` only on a **non-backward-compatible** change to this contract;
+  purely additive-optional fields (e.g. new `cfg` keys, §8) keep the same
+  `pv`. A peer that omits `pv` (a build predating this field) is treated as
+  compatible.
 - Transport v1 is Connect IQ phone-app messaging (BLE). Message shapes are
   transport-agnostic so an HTTP path can be added later (D2).
 - The scheduler lives in AnkiDroid. The watch never computes intervals —
@@ -33,12 +44,13 @@ Watch app UUID: `b1b0cef8a5b246af9c8ea2951c2d6bba`.
 
 | msg | shape |
 |---|---|
-| hello | `{p:1, t:"h", rev:<Int or null>, pend:<Int>}` |
+| hello | `{p:1, t:"h", pv:<Int>, rev:<Int or null>, pend:<Int>}` |
 | answers | `{p:1, t:"a", batch:<Int>, ans:[…], act:[…]}` |
 | state ack | `{p:1, ack:<rev>, ok:<Bool>, err?:<String>}` |
 
-- `hello` — sent on app start and on manual sync. `rev` = state revision
-  currently held (null = none), `pend` = queued answer+action count.
+- `hello` — sent on app start and on manual sync. `pv` = watch's
+  protocol/contract version (§1), `rev` = state revision currently held
+  (null = none), `pend` = queued answer+action count.
 - `answers.ans` — `[[cid, nid, ord, ease, timeMs, epochSec]…]`;
   `ease` 1–4 (Again/Hard/Good/Easy), `timeMs` capped at 60000,
   `epochSec` = watch Unix time at answer (informational only; AnkiDroid
@@ -54,6 +66,7 @@ State push, chunked; every chunk:
 `{p:1, t:"s", rev:<Int>, seq:<k 1..n>, of:<n>, cards:[<§2>…]}`
 
 Chunk `seq:1` additionally carries:
+- `pv: <Int>` — companion's protocol/contract version (§1).
 - `decks: [[deckIdx, deckId, name, nNew, nLrn, nRev]…]` — `deckId` as
   String, counts are today's due counts; max 8 decks.
 - `stats: [doneToday, streak]` — companion-computed (§7).

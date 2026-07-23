@@ -26,6 +26,9 @@ class PhoneLink {
 
     const CHUNK_TTL_MS = 60000;
     const AA_RETRY_MS = 30000;
+    // Protocol/contract version — SCHEMA.md §1. Sent in hello, compared
+    // against the companion's pv from state-push seq:1.
+    const PROTOCOL_VERSION = 1;
 
     // state-push assembly
     private var _rev = null;
@@ -82,7 +85,8 @@ class PhoneLink {
 
     function hello() as Void {
         var pend = CardStore.pendingCount();
-        _tx({"p" => 1, "t" => "h", "rev" => CardStore.getRev(), "pend" => pend});
+        _tx({"p" => 1, "t" => "h", "pv" => PROTOCOL_VERSION,
+             "rev" => CardStore.getRev(), "pend" => pend});
         if (pend > 0) {
             flush();
         }
@@ -159,6 +163,12 @@ class PhoneLink {
             _decks = d["decks"];
             _stats = d["stats"];
             _cfg = d["cfg"];
+            // Soft protocol-version check (SCHEMA.md §1): warn but keep going.
+            // An older companion may omit pv — treat that as compatible.
+            var pv = d["pv"];
+            if (pv instanceof Number && pv != PROTOCOL_VERSION) {
+                setStatus(WatchUi.loadResource(Rez.Strings.SyncVersionMismatch) as String);
+            }
         } else if (_rev == null || rev != _rev || of != _of) {
             return; // orphan chunk
         }
