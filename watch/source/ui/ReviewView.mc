@@ -4,6 +4,7 @@ import Toybox.WatchUi;
 import Toybox.System;
 import Toybox.Time;
 import Toybox.Application.Storage;
+import Toybox.Math;
 
 // One review session over a snapshot of a deck's cards.
 //
@@ -15,7 +16,7 @@ import Toybox.Application.Storage;
 // locally (max twice) so learning steps get a same-session second pass
 // (DECYZJE.md D3).
 //
-// Design ("ink & paper"): 120° progress arc along the top bezel, question in
+// Design ("ink & paper"): 120° progress dot-arc along the top bezel, question in
 // paper-white; on reveal the question dims to warm gray and the answer takes
 // the ink — hierarchy through light, not chrome. The only standing hint
 // system is the color ticks on the bezel at the physical buttons, colored
@@ -49,19 +50,26 @@ class ReviewView extends WatchUi.View {
         var cx = w / 2;
         var card = _cards[_i];
 
-        // Session progress: 120° arc across the top of the bezel (150°→30°).
-        var r = cx - 5;
-        dc.setPenWidth(3);
-        dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
-        dc.drawArc(cx, h / 2, r, Graphics.ARC_CLOCKWISE, 150, 30);
+        // Session progress: dots arc along the top bezel (150°→30°, 16 dots).
+        // Inset 15 px from edge so dots clear the UP-button area.
+        var r = cx - 15;
+        var cy = h / 2;
         var frac = _cards.size() > 0 ? _i.toFloat() / _cards.size() : 0.0;
-        if (frac > 0.0) {
-            dc.setPenWidth(5);
-            dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
-            dc.drawArc(cx, h / 2, r, Graphics.ARC_CLOCKWISE, 150,
-                150 - (120.0 * frac).toNumber());
+        var doneDots = (_cards.size() > 0)
+            ? (_i * 15 / _cards.size())  // 0..15 range for 16 dots (indices 0..15)
+            : -1;
+        for (var di = 0; di < 16; di++) {
+            var angleDeg = 150.0 - (120.0 * di / 15.0);
+            var angleRad = angleDeg * Math.PI / 180.0;
+            var dx = (cx + r * Math.cos(angleRad)).toNumber();
+            var dy = (cy - r * Math.sin(angleRad)).toNumber();
+            if (di <= doneDots) {
+                dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
+            } else {
+                dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
+            }
+            dc.fillCircle(dx, dy, 1);
         }
-        dc.setPenWidth(1);
 
         dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 6 / 100, Graphics.FONT_XTINY,

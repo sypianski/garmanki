@@ -45,7 +45,7 @@
 
     <string id="MenuSyncTitle">Sync</string>
     <string id="SyncSent">Sync requested</string>
-    <string id="SyncNoPhone">Open Garmanki on your phone</string>
+    <string id="SyncNoPhone">To sync, open Garmanki on your phone</string>
     <string id="SyncApplied">Deck updated</string>
     <string id="SyncAnswersOk">Answers delivered</string>
     <string id="SyncNever">Not synced yet</string>

@@ -56,59 +56,53 @@ class HomeView extends WatchUi.View {
         } else {
             // Hero: cards still due today.
             dc.setColor(Theme.PAPER, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 24 / 100, Graphics.FONT_NUMBER_THAI_HOT,
+            dc.drawText(cx, h * 26 / 100, Graphics.FONT_NUMBER_MILD,
                 remaining.toString(), Graphics.TEXT_JUSTIFY_CENTER);
             dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 52 / 100, Graphics.FONT_XTINY,
+            dc.drawText(cx, h * 46 / 100, Graphics.FONT_XTINY,
                 Theme.spaced(WatchUi.loadResource(Rez.Strings.HomeDue) as String),
                 Graphics.TEXT_JUSTIFY_CENTER);
 
-            // Build the info line richest-first, then drop trailing segments
-            // until it fits the chord of the round screen at this height.
+            // Deck + streak info line.
             var base = decks.size().toString() + " "
                 + (WatchUi.loadResource(Rez.Strings.HomeDecks) as String).toLower();
             var streak = stats[1] instanceof Number ? stats[1] : 0;
-            var pend = CardStore.pendingCount();
-            var candidates = [];
             var full = base;
             if (streak > 0) {
                 full += " · " + streak.toString() + " "
                     + (WatchUi.loadResource(Rez.Strings.HomeStreak) as String);
             }
-            if (pend > 0) {
-                candidates.add(full + " · " + pend.toString() + " "
-                    + (WatchUi.loadResource(Rez.Strings.HomePending) as String));
-            }
-            candidates.add(full);
-            candidates.add(base);
-            var lineY = h * 62 / 100;
+            var lineY = h * 56 / 100;
             var fontH = dc.getFontHeight(Graphics.FONT_XTINY);
             var maxW = Theme.chordWidth(dc, lineY + fontH / 2, 8);
-            var line = candidates[candidates.size() - 1];
-            for (var i = 0; i < candidates.size(); i++) {
-                if (dc.getTextWidthInPixels(candidates[i], Graphics.FONT_XTINY) <= maxW) {
-                    line = candidates[i];
-                    break;
-                }
-            }
+            var line = dc.getTextWidthInPixels(full, Graphics.FONT_XTINY) <= maxW ? full : base;
             dc.drawText(cx, lineY, Graphics.FONT_XTINY, line,
                 Graphics.TEXT_JUSTIFY_CENTER);
+
+            // Pending answers — own line when non-zero.
+            var pend = CardStore.pendingCount();
+            if (pend > 0) {
+                dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
+                dc.drawText(cx, h * 64 / 100, Graphics.FONT_XTINY,
+                    pend.toString() + " "
+                        + (WatchUi.loadResource(Rez.Strings.HomePending) as String),
+                    Graphics.TEXT_JUSTIFY_CENTER);
+            }
         }
 
+        // Sync line — always visible; replaced by status while status is fresh.
         var link = Link.get();
         var status = link.status;
-        // Treat status as expired after STATUS_TTL_MS, even without a timer
-        // firing — avoids relying on Garmin's potentially-suspended timers.
         var statusFresh = status.length() > 0
             && (System.getTimer() - link.statusSetMs) < link.STATUS_TTL_MS;
         if (statusFresh) {
             dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 72 / 100, Graphics.FONT_XTINY, status,
+            dc.drawText(cx, h * 74 / 100, Graphics.FONT_XTINY, status,
                 Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             var syncT = CardStore.getLastSyncTime();
             dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 72 / 100, Graphics.FONT_XTINY,
+            dc.drawText(cx, h * 74 / 100, Graphics.FONT_XTINY,
                 syncT instanceof Number
                     ? _syncLine(syncT as Number)
                     : (WatchUi.loadResource(Rez.Strings.SyncNever) as String),
