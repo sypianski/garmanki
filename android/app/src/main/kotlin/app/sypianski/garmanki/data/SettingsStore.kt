@@ -26,6 +26,8 @@ data class Settings(
     val actionMap: Map<String, Int> = SettingsStore.DEFAULT_ACTION_MAP,
     val cardActions: Set<String> = SettingsStore.ALL_CARD_ACTIONS,
     val guideReset: Int = 0,
+    /** App appearance, SettingsStore.THEME_*: "system" (dynamic/slate) or "eink". */
+    val themeMode: String = SettingsStore.THEME_SYSTEM,
 )
 
 /** Persistence seam for SyncEngine — faked in unit tests. */
@@ -51,6 +53,7 @@ class SettingsStore(private val context: Context) : SyncPrefs {
         val actionMap = stringPreferencesKey("actionMap")
         val cardActions = stringSetPreferencesKey("cardActions")
         val guideReset = intPreferencesKey("guideReset")
+        val themeMode = stringPreferencesKey("themeMode")
     }
 
     private val logSerializer = MapSerializer(Long.serializer(), Int.serializer())
@@ -68,6 +71,7 @@ class SettingsStore(private val context: Context) : SyncPrefs {
             actionMap = decodeActionMap(p[Keys.actionMap]),
             cardActions = p[Keys.cardActions] ?: ALL_CARD_ACTIONS,
             guideReset = p[Keys.guideReset] ?: 0,
+            themeMode = p[Keys.themeMode] ?: THEME_SYSTEM,
         )
     }
 
@@ -118,6 +122,11 @@ class SettingsStore(private val context: Context) : SyncPrefs {
         }
     }
 
+    suspend fun setThemeMode(mode: String) {
+        val clean = if (mode == THEME_EINK) THEME_EINK else THEME_SYSTEM
+        context.dataStore.edit { it[Keys.themeMode] = clean }
+    }
+
     /** SCHEMA.md §8 `gr`: any new value replays the guide on the watch. */
     suspend fun bumpGuideReset() {
         context.dataStore.edit { it[Keys.guideReset] = (it[Keys.guideReset] ?: 0) + 1 }
@@ -138,6 +147,10 @@ class SettingsStore(private val context: Context) : SyncPrefs {
 
     companion object {
         const val DEFAULT_CARD_LIMIT = 100
+
+        /** Appearance modes (Settings.themeMode). */
+        const val THEME_SYSTEM = "system"
+        const val THEME_EINK = "eink"
 
         /** Watch input events, SCHEMA.md §8 / DECYZJE.md D13–D16. */
         val WATCH_EVENTS = listOf(

@@ -18,6 +18,9 @@
     <string name="decks_section">Decks to sync</string>
     <string name="decks_none">No decks found</string>
     <string name="decks_select_all">Select all</string>
+    <string name="nav_decks_title">Decks</string>
+    <string name="nav_shortcuts_title">Shortcuts</string>
+    <string name="nav_back">Back</string>
     <string name="deck_due_counts">%1$d new · %2$d learning · %3$d review</string>
     <string name="card_limit">Cards per deck: %1$d</string>
 
@@ -42,4 +45,8 @@
     <string name="controls_need_grades">Mapping must include both Again and Good</string>
     <string name="controls_actions_hint">Card actions available in the watch menu:</string>
     <string name="controls_guide">Show the guide again</string>
+
+    <string name="theme_section">Appearance</string>
+    <string name="theme_dynamic">Dynamic</string>
+    <string name="theme_eink">E-ink</string>
 </resources>

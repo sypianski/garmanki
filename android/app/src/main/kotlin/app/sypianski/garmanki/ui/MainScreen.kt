@@ -56,6 +56,7 @@ import app.sypianski.garmanki.ciq.CiqState
 import app.sypianski.garmanki.ciq.PushStatus
 import app.sypianski.garmanki.ciq.WatchDevice
 import app.sypianski.garmanki.data.Settings
+import app.sypianski.garmanki.data.SettingsStore
 import app.sypianski.garmanki.data.Stats
 import kotlinx.coroutines.launch
 
@@ -65,7 +66,8 @@ private const val ROUTE_SHORTCUTS = "shortcuts"
 
 @Composable
 fun MainScreen(app: App) {
-    GarmankiTheme {
+    val settings by app.settings.flow.collectAsState(initial = null)
+    GarmankiTheme(eink = settings?.themeMode == SettingsStore.THEME_EINK) {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = ROUTE_HOME) {
             composable(ROUTE_HOME) { HomeScreen(app, navController) }
@@ -142,6 +144,13 @@ private fun HomeScreen(app: App, navController: NavHostController) {
             }
 
             item {
+                ThemeCard(
+                    current = settings?.themeMode ?: SettingsStore.THEME_SYSTEM,
+                    onSelect = { mode -> app.appScope.launch { app.settings.setThemeMode(mode) } },
+                )
+            }
+
+            item {
                 CustomStudyFooter {
                     context.packageManager
                         .getLaunchIntentForPackage(FlashCards.ANKIDROID_PACKAGE)
@@ -172,6 +181,51 @@ internal fun ScreenScaffold(
                 )
             },
         ) { padding -> content(padding) }
+    }
+}
+
+@Composable
+private fun ThemeCard(current: String, onSelect: (String) -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                stringResource(R.string.theme_section),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ThemeOption(
+                    label = stringResource(R.string.theme_dynamic),
+                    selected = current != SettingsStore.THEME_EINK,
+                    onClick = { onSelect(SettingsStore.THEME_SYSTEM) },
+                    modifier = Modifier.weight(1f),
+                )
+                ThemeOption(
+                    label = stringResource(R.string.theme_eink),
+                    selected = current == SettingsStore.THEME_EINK,
+                    onClick = { onSelect(SettingsStore.THEME_EINK) },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+/** Filled = selected, outlined = not — a segmented look on stable M3 buttons. */
+@Composable
+private fun ThemeOption(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (selected) {
+        Button(onClick = onClick, modifier = modifier) { Text(label) }
+    } else {
+        OutlinedButton(onClick = onClick, modifier = modifier) { Text(label) }
     }
 }
 
