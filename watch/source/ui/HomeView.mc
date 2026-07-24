@@ -72,17 +72,17 @@ class HomeView extends WatchUi.View {
             // "Done for today" state — the hero has to communicate rest, not
             // an ambiguous zero. Checkmark glyph + subtitle count.
             dc.setColor(Theme.GOOD, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 24 / 100, Graphics.FONT_NUMBER_MEDIUM,
+            dc.drawText(cx, h * 20 / 100, Graphics.FONT_NUMBER_MEDIUM,
                 "✓", Graphics.TEXT_JUSTIFY_CENTER);
             dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 46 / 100, Graphics.FONT_XTINY,
+            dc.drawText(cx, h * 42 / 100, Graphics.FONT_XTINY,
                 Theme.spaced(WatchUi.loadResource(Rez.Strings.HomeAllDone) as String),
                 Graphics.TEXT_JUSTIFY_CENTER);
-            _drawHabit(dc, cx, h * 56 / 100, decks.size(), stats);
+            _drawHabit(dc, cx, h * 52 / 100, decks.size(), stats);
         } else {
             // Hero: cards still due today.
             dc.setColor(Theme.PAPER, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 24 / 100, Graphics.FONT_NUMBER_MILD,
+            dc.drawText(cx, h * 20 / 100, Graphics.FONT_NUMBER_MILD,
                 remaining.toString(), Graphics.TEXT_JUSTIFY_CENTER);
             // Split: "8 new · 12 rev" replaces the generic "due" caption. Only
             // draws when either side is non-zero AND the sum matches remaining
@@ -106,9 +106,9 @@ class HomeView extends WatchUi.View {
             if (subLine == null) {
                 subLine = Theme.spaced(WatchUi.loadResource(Rez.Strings.HomeDue) as String);
             }
-            dc.drawText(cx, h * 44 / 100, Graphics.FONT_XTINY, subLine,
+            dc.drawText(cx, h * 40 / 100, Graphics.FONT_XTINY, subLine,
                 Graphics.TEXT_JUSTIFY_CENTER);
-            _drawHabit(dc, cx, h * 54 / 100, decks.size(), stats);
+            _drawHabit(dc, cx, h * 50 / 100, decks.size(), stats);
         }
 
         // Sync-time line — ALWAYS visible. This is the load-bearing signal for
@@ -121,35 +121,51 @@ class HomeView extends WatchUi.View {
             && (System.getTimer() - link.statusSetMs) < link.STATUS_TTL_MS;
 
         var syncT = CardStore.getLastSyncTime();
-        var syncText = (syncT instanceof Number)
-            ? _syncLine(syncT as Number)
-            : (WatchUi.loadResource(Rez.Strings.SyncNever) as String);
-        dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 66 / 100, Graphics.FONT_XTINY, syncText,
-            Graphics.TEXT_JUSTIFY_CENTER);
+        var syncY = h * 62 / 100;
+        if (syncT instanceof Number) {
+            dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, syncY, Graphics.FONT_XTINY,
+                _syncLine(syncT as Number), Graphics.TEXT_JUSTIFY_CENTER);
+        }
 
         // Below the sync-time: transient status wins the accent slot (short
         // "Sync requested" / "Answers delivered" flashes); otherwise the CTA
-        // tells the user what to do about outstanding work.
+        // tells the user what to do about outstanding work, or (fresh install)
+        // to connect the phone at all.
         var pend = CardStore.pendingCount();
         var phoneOn = System.getDeviceSettings().phoneConnected;
         var ctaText = null;
         if (statusFresh) {
             ctaText = status;
         } else if (pend > 0) {
-            var t = pend.toString() + " "
+            var unsynced = pend.toString() + " "
                 + (WatchUi.loadResource(Rez.Strings.SyncUnsynced) as String);
             if (!phoneOn) {
-                t += " · " + (WatchUi.loadResource(Rez.Strings.SyncOpenPhone) as String);
+                var openP = WatchUi.loadResource(Rez.Strings.SyncOpenPhone) as String;
+                ctaText = unsynced + " · " + openP;
+            } else {
+                ctaText = unsynced;
             }
-            ctaText = t;
-        } else if (!phoneOn && !(syncT instanceof Number)) {
-            // Fresh install, phone still not around — say what to do.
+        } else if (!(syncT instanceof Number)) {
+            // Fresh install — no sync ever succeeded. Push the user toward
+            // the one action that unblocks everything.
+            ctaText = WatchUi.loadResource(Rez.Strings.SyncConnectPhone) as String;
+        } else if (!phoneOn) {
             ctaText = WatchUi.loadResource(Rez.Strings.SyncPhoneOff) as String;
         }
         if (ctaText != null) {
+            var ctaY = h * 74 / 100;
+            var fontH = dc.getFontHeight(Graphics.FONT_XTINY);
+            var ctaMax = Theme.chordWidth(dc, ctaY + fontH / 2, 8);
+            if (dc.getTextWidthInPixels(ctaText, Graphics.FONT_XTINY) > ctaMax
+                    && pend > 0 && !phoneOn) {
+                // Round-bezel fallback: drop the "N unsynced ·" prefix and
+                // keep the imperative half — the pending count is already
+                // implied by the presence of the CTA at all.
+                ctaText = WatchUi.loadResource(Rez.Strings.SyncOpenPhone) as String;
+            }
             dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 76 / 100, Graphics.FONT_XTINY, ctaText,
+            dc.drawText(cx, ctaY, Graphics.FONT_XTINY, ctaText,
                 Graphics.TEXT_JUSTIFY_CENTER);
         }
 
@@ -181,27 +197,16 @@ class HomeView extends WatchUi.View {
     }
 
     private function _syncLine(syncT as Number) as String {
-        var nowSecs = Time.now().value();
-        var diff = nowSecs - syncT;
-        if (diff < 300) {
-            return WatchUi.loadResource(Rez.Strings.SyncJustNow) as String;
-        }
+        // Always shape: "D MMM HH:MM" (e.g. "24 Jul 14:32"). The user's mental
+        // model of "how stale is my state" needs a concrete date, not a
+        // relative phrase like "just now" or "Yesterday" — those hide the
+        // one number that matters when something is actually wrong.
         var si = Gregorian.info(new Time.Moment(syncT), Time.FORMAT_SHORT);
         var timeStr = si.hour.format("%02d") + ":" + si.min.format("%02d");
-        var daysDiff = (nowSecs / 86400) - (syncT / 86400);
-        if (daysDiff == 0) {
-            return (WatchUi.loadResource(Rez.Strings.SyncedAt) as String) + " " + timeStr;
-        }
-        if (daysDiff == 1) {
-            return (WatchUi.loadResource(Rez.Strings.SyncYesterday) as String) + " " + timeStr;
-        }
-        if (daysDiff <= 7) {
-            var dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            return dow[(si.day_of_week as Number) - 1] + " " + timeStr;
-        }
         var mon = ["Jan","Feb","Mar","Apr","May","Jun",
                    "Jul","Aug","Sep","Oct","Nov","Dec"];
-        return si.day.toString() + " " + mon[(si.month as Number) - 1] + " " + timeStr;
+        return si.day.toString() + " " + mon[(si.month as Number) - 1]
+            + " " + timeStr;
     }
 }
 

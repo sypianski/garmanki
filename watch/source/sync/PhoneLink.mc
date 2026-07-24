@@ -67,9 +67,20 @@ class PhoneLink {
             return;
         }
         var t = d["t"];
-        if (t != null && "s".equals(t)) {
+        if (t == null) {
+            return;
+        }
+        // Any well-formed message from the phone counts as "we were in
+        // contact just now" for the home sync-time line. Previously we only
+        // stamped on a full state assembly or an ack'd answer batch, which
+        // meant an install that had partial chunks, malformed pushes, or a
+        // one-way outbound queue never got a date on the home screen at all.
+        if ("s".equals(t) || "aa".equals(t)) {
+            CardStore.setLastSyncTime(Time.now().value());
+        }
+        if ("s".equals(t)) {
             _onState(d);
-        } else if (t != null && "aa".equals(t)) {
+        } else if ("aa".equals(t)) {
             _onAnswersAck(d);
         }
     }
