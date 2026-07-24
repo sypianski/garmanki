@@ -7,7 +7,56 @@
                     type="watch-app"
                     minApiLevel="4.2.1">
         <iq:products>
+            <!-- AMOLED 454x454 -->
             <iq:product id="fr965"/>
+            <iq:product id="fr970"/>
+            <iq:product id="venu3"/>
+            <iq:product id="venu445mm"/>
+            <iq:product id="epix2pro51mm"/>
+            <iq:product id="fenix847mm"/>
+            <iq:product id="fr57047mm"/>
+            <!-- AMOLED 416x416 -->
+            <iq:product id="fr265"/>
+            <iq:product id="epix2"/>
+            <iq:product id="epix2pro47mm"/>
+            <iq:product id="fenix843mm"/>
+            <iq:product id="fenixe"/>
+            <iq:product id="instinct3amoled50mm"/>
+            <iq:product id="venu2"/>
+            <iq:product id="venu2plus"/>
+            <!-- AMOLED 390x390 -->
+            <iq:product id="fr165"/>
+            <iq:product id="fr165m"/>
+            <iq:product id="fr57042mm"/>
+            <iq:product id="epix2pro42mm"/>
+            <iq:product id="marq2"/>
+            <iq:product id="marq2aviator"/>
+            <iq:product id="venu3s"/>
+            <iq:product id="venu441mm"/>
+            <iq:product id="vivoactive5"/>
+            <iq:product id="vivoactive6"/>
+            <iq:product id="instinct3amoled45mm"/>
+            <!-- AMOLED 360x360 -->
+            <iq:product id="fr265s"/>
+            <iq:product id="venu2s"/>
+            <!-- MIP 280x280 -->
+            <iq:product id="fenix7x"/>
+            <iq:product id="fenix7xpro"/>
+            <iq:product id="fenix8solar51mm"/>
+            <iq:product id="enduro3"/>
+            <!-- MIP 260x260 -->
+            <iq:product id="fr255"/>
+            <iq:product id="fr255m"/>
+            <iq:product id="fr955"/>
+            <iq:product id="fenix7"/>
+            <iq:product id="fenix7pro"/>
+            <iq:product id="fenix8solar47mm"/>
+            <!-- MIP 240x240 -->
+            <iq:product id="fenix7s"/>
+            <iq:product id="fenix7spro"/>
+            <!-- MIP 218x218 -->
+            <iq:product id="fr255s"/>
+            <iq:product id="fr255sm"/>
         </iq:products>
         <iq:permissions>
             <iq:uses-permission id="Communications"/>

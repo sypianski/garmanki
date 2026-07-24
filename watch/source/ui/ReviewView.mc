@@ -181,8 +181,8 @@ class ReviewView extends WatchUi.View {
         var known = _done + 1 + remaining;
 
         // Session progress: dots arc along the top bezel (150°→30°, 16 dots).
-        // Inset 15 px from edge so dots clear the UP-button area.
-        var r = cx - 15;
+        // Inset (15 px on 454) from edge so dots clear the UP-button area.
+        var r = cx - Theme.px(dc, 15);
         var cy = h / 2;
         var doneDots = known > 0
             ? (_done * 15 / known)  // 0..15 range for 16 dots (indices 0..15)
@@ -197,7 +197,7 @@ class ReviewView extends WatchUi.View {
             } else {
                 dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
             }
-            dc.fillCircle(dx, dy, 1);
+            dc.fillCircle(dx, dy, Theme.px(dc, 1));
         }
 
         dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
@@ -233,7 +233,8 @@ class ReviewView extends WatchUi.View {
             });
             q.draw(dc);
             dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
-            dc.fillRectangle(cx - 22, h * 39 / 100, 44, 3);
+            dc.fillRectangle(cx - Theme.px(dc, 22), h * 39 / 100,
+                Theme.px(dc, 44), Theme.px(dc, 3));
             var a = new WatchUi.TextArea({
                 :text => card[5] as String,
                 :color => Theme.PAPER,
@@ -247,8 +248,12 @@ class ReviewView extends WatchUi.View {
             });
             a.draw(dc);
             // Ticks reflect the live mapping — button order: UP, DOWN, START.
-            var events = ["up", "down", "start"];
-            var angles = [Theme.ANG_UP, Theme.ANG_DOWN, Theme.ANG_START];
+            // Touch-first devices have no UP/DOWN pair; only the START tick.
+            var events = DeviceProfile.HAS_UPDOWN_BUTTONS
+                ? ["up", "down", "start"] : ["start"];
+            var angles = DeviceProfile.HAS_UPDOWN_BUTTONS
+                ? [Theme.ANG_UP, Theme.ANG_DOWN, Theme.ANG_START]
+                : [Theme.ANG_START];
             for (var k = 0; k < events.size(); k++) {
                 var ease = ActionMap.easeFor(events[k]);
                 if (ease != null) {

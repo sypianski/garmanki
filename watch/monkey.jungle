@@ -1,3 +1,32 @@
 project.manifest = manifest.xml
 
-base.sourcePath = source
+# Default profile: five buttons + AMOLED (fr9xx, epix2, fenix8 AMOLED,
+# marq2, fr2x5 AMOLED, fr165, instinct3 AMOLED, fenixe, fr570).
+base.sourcePath = source;source-profile/fivebtn-amoled
+
+# Touch-first AMOLED (2 right-side buttons, no UP/DOWN pair).
+venu2.sourcePath = source;source-profile/touch-amoled
+venu2plus.sourcePath = source;source-profile/touch-amoled
+venu2s.sourcePath = source;source-profile/touch-amoled
+venu3.sourcePath = source;source-profile/touch-amoled
+venu3s.sourcePath = source;source-profile/touch-amoled
+venu441mm.sourcePath = source;source-profile/touch-amoled
+venu445mm.sourcePath = source;source-profile/touch-amoled
+vivoactive5.sourcePath = source;source-profile/touch-amoled
+vivoactive6.sourcePath = source;source-profile/touch-amoled
+
+# Five buttons + 64-color MIP (fenix7, fr255/955, enduro3, fenix8 solar).
+fenix7.sourcePath = source;source-profile/fivebtn-mip
+fenix7pro.sourcePath = source;source-profile/fivebtn-mip
+fenix7s.sourcePath = source;source-profile/fivebtn-mip
+fenix7spro.sourcePath = source;source-profile/fivebtn-mip
+fenix7x.sourcePath = source;source-profile/fivebtn-mip
+fenix7xpro.sourcePath = source;source-profile/fivebtn-mip
+fenix8solar47mm.sourcePath = source;source-profile/fivebtn-mip
+fenix8solar51mm.sourcePath = source;source-profile/fivebtn-mip
+enduro3.sourcePath = source;source-profile/fivebtn-mip
+fr255.sourcePath = source;source-profile/fivebtn-mip
+fr255m.sourcePath = source;source-profile/fivebtn-mip
+fr255s.sourcePath = source;source-profile/fivebtn-mip
+fr255sm.sourcePath = source;source-profile/fivebtn-mip
+fr955.sourcePath = source;source-profile/fivebtn-mip

@@ -29,9 +29,23 @@ class SummaryView extends WatchUi.View {
             Theme.spaced(WatchUi.loadResource(Rez.Strings.SummaryTitle) as String),
             Graphics.TEXT_JUSTIFY_CENTER);
 
+        // Hero count: largest number font that still fits the chord at its
+        // vertical band — THAI_HOT overflows small MIP screens.
+        var heroTxt = _done.toString();
+        var fonts = [Graphics.FONT_NUMBER_THAI_HOT, Graphics.FONT_NUMBER_HOT,
+                     Graphics.FONT_NUMBER_MEDIUM, Graphics.FONT_NUMBER_MILD];
+        var heroFont = fonts[fonts.size() - 1];
+        for (var i = 0; i < fonts.size(); i++) {
+            var fh = dc.getFontHeight(fonts[i]);
+            if (dc.getTextWidthInPixels(heroTxt, fonts[i])
+                    <= Theme.chordWidth(dc, h * 26 / 100 + fh / 2, 8)) {
+                heroFont = fonts[i];
+                break;
+            }
+        }
         dc.setColor(Theme.PAPER, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 26 / 100, Graphics.FONT_NUMBER_THAI_HOT,
-            _done.toString(), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(cx, h * 26 / 100, heroFont,
+            heroTxt, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 55 / 100, Graphics.FONT_TINY,

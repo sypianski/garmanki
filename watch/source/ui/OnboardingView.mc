@@ -52,8 +52,10 @@ class OnboardingView extends WatchUi.View {
 
     // Slide 1: any button (or tap) reveals the answer.
     private function _drawReveal(dc as Dc) as Void {
-        Theme.tick(dc, Theme.ANG_UP, Theme.ACCENT);
-        Theme.tick(dc, Theme.ANG_DOWN, Theme.ACCENT);
+        if (DeviceProfile.HAS_UPDOWN_BUTTONS) {
+            Theme.tick(dc, Theme.ANG_UP, Theme.ACCENT);
+            Theme.tick(dc, Theme.ANG_DOWN, Theme.ACCENT);
+        }
         Theme.tick(dc, Theme.ANG_START, Theme.ACCENT);
         _centerText(dc, Rez.Strings.Guide1, Theme.PAPER);
     }
@@ -63,10 +65,14 @@ class OnboardingView extends WatchUi.View {
         var h = dc.getHeight();
         var cx = dc.getWidth() / 2;
         var cy = h / 2;
-        var events = ["up", "down", "start"];
-        var angles = [Theme.ANG_UP, Theme.ANG_DOWN, Theme.ANG_START];
+        var events = DeviceProfile.HAS_UPDOWN_BUTTONS
+            ? ["up", "down", "start"] : ["start"];
+        var angles = DeviceProfile.HAS_UPDOWN_BUTTONS
+            ? [Theme.ANG_UP, Theme.ANG_DOWN, Theme.ANG_START]
+            : [Theme.ANG_START];
         var fontH = dc.getFontHeight(Graphics.FONT_TINY);
-        var lr = cx - 45; // label anchor radius, just inside the ticks
+        // Label anchor radius, just inside the ticks.
+        var lr = cx - Theme.px(dc, 45);
 
         for (var i = 0; i < events.size(); i++) {
             var ease = ActionMap.easeFor(events[i]);
@@ -112,16 +118,17 @@ class OnboardingView extends WatchUi.View {
             var ease = rows[i][1] as Number;
             var color = Theme.easeColor(ease);
             var iconY = y + fontH / 2;
+            var iconX = cx - Theme.px(dc, 60);
             if ("tap".equals(key)) {
                 dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-                dc.fillCircle(cx - 60, iconY, 5);
-                dc.drawCircle(cx - 60, iconY, 9);
+                dc.fillCircle(iconX, iconY, Theme.px(dc, 5));
+                dc.drawCircle(iconX, iconY, Theme.px(dc, 9));
             } else {
-                _arrow(dc, cx - 60, iconY, key, color);
+                _arrow(dc, iconX, iconY, key, color);
             }
             dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx - 38, y, Graphics.FONT_TINY, _easeWord(ease),
-                Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(cx - Theme.px(dc, 38), y, Graphics.FONT_TINY,
+                _easeWord(ease), Graphics.TEXT_JUSTIFY_LEFT);
             y += rowH;
         }
     }
@@ -130,7 +137,9 @@ class OnboardingView extends WatchUi.View {
     private function _drawMore(dc as Dc) as Void {
         var h = dc.getHeight();
         var cx = dc.getWidth() / 2;
-        Theme.tick(dc, Theme.ANG_UP, Theme.ACCENT);
+        if (DeviceProfile.HAS_UPDOWN_BUTTONS) {
+            Theme.tick(dc, Theme.ANG_UP, Theme.ACCENT);
+        }
         _centerText(dc, Rez.Strings.Guide4, Theme.PAPER);
         var y = h * 76 / 100;
         var done = WatchUi.loadResource(Rez.Strings.GuideDone) as String;
@@ -171,7 +180,7 @@ class OnboardingView extends WatchUi.View {
     // Solid triangle — built-in fonts don't guarantee arrow glyphs.
     private function _arrow(dc as Dc, x as Number, y as Number,
             key as String, color as Number) as Void {
-        var s = 9;
+        var s = Theme.px(dc, 9);
         var pts;
         if ("swipeR".equals(key)) {
             pts = [[x - s, y - s], [x + s, y], [x - s, y + s]];
@@ -189,13 +198,13 @@ class OnboardingView extends WatchUi.View {
     private function _dots(dc as Dc) as Void {
         var h = dc.getHeight();
         var cx = dc.getWidth() / 2;
-        var spacing = 16;
+        var spacing = Theme.px(dc, 16);
         var x = cx - spacing * (SLIDES - 1) / 2;
         var y = h * 88 / 100;
         for (var i = 0; i < SLIDES; i++) {
             dc.setColor(i == _slide ? Theme.ACCENT : Theme.FAINT,
                 Graphics.COLOR_TRANSPARENT);
-            dc.fillCircle(x + i * spacing, y, 3);
+            dc.fillCircle(x + i * spacing, y, Theme.px(dc, 3));
         }
     }
 

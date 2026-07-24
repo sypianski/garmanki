@@ -70,10 +70,16 @@ class HomeView extends WatchUi.View {
             ta.draw(dc);
         } else if (remaining == 0 && done > 0) {
             // "Done for today" state — the hero has to communicate rest, not
-            // an ambiguous zero. Checkmark glyph + subtitle count.
+            // an ambiguous zero. Drawn checkmark (number fonts don't
+            // guarantee a ✓ glyph on every device) + subtitle count.
+            var fh = dc.getFontHeight(Graphics.FONT_NUMBER_MEDIUM);
+            var mcy = h * 20 / 100 + fh / 2;
+            var ms = fh * 30 / 100; // half-width of the mark
             dc.setColor(Theme.GOOD, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 20 / 100, Graphics.FONT_NUMBER_MEDIUM,
-                "✓", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.setPenWidth(Theme.px(dc, 8));
+            dc.drawLine(cx - ms, mcy, cx - ms / 3, mcy + ms * 2 / 3);
+            dc.drawLine(cx - ms / 3, mcy + ms * 2 / 3, cx + ms, mcy - ms * 2 / 3);
+            dc.setPenWidth(1);
             dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 42 / 100, Graphics.FONT_XTINY,
                 Theme.spaced(WatchUi.loadResource(Rez.Strings.HomeAllDone) as String),
@@ -172,8 +178,10 @@ class HomeView extends WatchUi.View {
         Theme.tick(dc, Theme.ANG_START, Theme.ACCENT);
         // Phone-off warning tick — only when there IS something the phone
         // could fix (outstanding answers or a fresh install with no data).
-        // Silent bezel when everything is fine.
-        if (!phoneOn && (pend > 0 || decks.size() == 0)) {
+        // Silent bezel when everything is fine. Touch-first devices keep
+        // the bezel clear of indicators entirely (CTA line carries it).
+        if (DeviceProfile.HAS_UPDOWN_BUTTONS
+                && !phoneOn && (pend > 0 || decks.size() == 0)) {
             Theme.tick(dc, Theme.ANG_LINK, Theme.MUTED);
         }
     }

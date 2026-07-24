@@ -7,26 +7,34 @@ import Toybox.Math;
 // True black ground (AMOLED), warm paper-white ink, a single amber accent,
 // and color ticks on the bezel aligned with the physical buttons: the hint
 // system IS the hardware. Grade colors mirror Anki: red=Again, green=Good.
+//
+// Palette and button angles come from DeviceProfile — one variant per
+// device family, selected in monkey.jungle via sourcePath.
 module Theme {
 
-    const BG     = 0x000000;
-    const PAPER  = 0xF5EFE3; // warm off-white "ink"
-    const MUTED  = 0x8A8478; // warm gray
-    const FAINT  = 0x2E2B26; // hairlines / idle ring
-    const ACCENT = 0xFFB300; // amber
-    const AGAIN  = 0xFF5A48;
-    const HARD   = 0xFF8C42; // muted orange (Anki convention)
-    const GOOD   = 0x4CD07D;
-    const EASY   = 0x4FA8D8; // calm blue (Anki convention)
+    const BG     = DeviceProfile.BG;
+    const PAPER  = DeviceProfile.PAPER;
+    const MUTED  = DeviceProfile.MUTED;
+    const FAINT  = DeviceProfile.FAINT;
+    const ACCENT = DeviceProfile.ACCENT;
+    const AGAIN  = DeviceProfile.AGAIN;
+    const HARD   = DeviceProfile.HARD;
+    const GOOD   = DeviceProfile.GOOD;
+    const EASY   = DeviceProfile.EASY;
 
-    // Physical button angles on FR965 (degrees, 0 = 3 o'clock, CCW positive).
-    // NOTE: fr965-specific — parameterize per device before adding targets.
-    const ANG_START = 30;
-    const ANG_UP    = 150;
-    const ANG_DOWN  = 210;
+    const ANG_START = DeviceProfile.ANG_START;
+    const ANG_UP    = DeviceProfile.ANG_UP;
+    const ANG_DOWN  = DeviceProfile.ANG_DOWN;
     // Non-button bezel positions used as status indicators (drawn only when
     // there's something to say — a silent bezel means "everything's fine").
-    const ANG_LINK  = 180; // 9 o'clock: phone link health warning
+    const ANG_LINK  = DeviceProfile.ANG_LINK;
+
+    // Scale a pixel measure designed on the 454x454 reference (fr965) to
+    // the current display, rounded, never below 1 px.
+    function px(dc as Dc, v as Number) as Number {
+        var s = (dc.getWidth() * v + 227) / 454;
+        return s < 1 ? 1 : s;
+    }
 
     // Bezel tick / caption color for an Anki ease (1=Again … 4=Easy).
     function easeColor(ease as Number) as Number {
@@ -40,9 +48,9 @@ module Theme {
     function tick(dc as Dc, angle as Number, color as Number) as Void {
         var cx = dc.getWidth() / 2;
         var cy = dc.getHeight() / 2;
-        var r = cx - 5;
+        var r = cx - px(dc, 5);
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-        dc.setPenWidth(7);
+        dc.setPenWidth(px(dc, 7));
         dc.drawArc(cx, cy, r, Graphics.ARC_COUNTER_CLOCKWISE, angle - 7, angle + 7);
         dc.setPenWidth(1);
     }
