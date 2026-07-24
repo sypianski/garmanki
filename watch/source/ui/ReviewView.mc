@@ -12,9 +12,20 @@ import Toybox.Math;
 // Keys (D13/D14, mapping configurable via ActionMap): any grade key reveals;
 // then defaults UP=Easy, DOWN=Good, START=Again; hold UP (onMenu) = action
 // menu: card actions plus only the grades no button/gesture reaches (GAR-06). Touch (D15/D16): tap reveals, then tap=Good; swipes
-// →Good ←Again ↑Easy ↓Hard, also via ActionMap. "Again" re-queues the card
-// locally (max twice) so learning steps get a same-session second pass
-// (DECYZJE.md D3).
+// →Good ←Again ↑Easy ↓Hard, also via ActionMap.
+//
+// Same-session learning queue (DECYZJE.md D3). The scheduler still lives in
+// AnkiDroid — but within a sitting we mimic Anki's learning queue so a failed
+// card comes back *interleaved*, not dumped at the tail. Two queues: `_new`
+// (unseen cards, cursor `_ni`) and `_learn` (entries [dueMs, card, stepIdx]
+// carrying a due timestamp from System.getTimer()). _pick() prefers a learn
+// card whose due has passed, else the next new card, else — when no new cards
+// remain — the soonest-due learn card early (Anki's "learn ahead"). The step
+// length is borrowed straight from AnkiDroid: nt1 is the Again next-interval
+// label (NEXT_REVIEW_TIMES), so we reuse the scheduler's own answer instead of
+// recomputing it. Termination is guaranteed by STEP_CAP (a card re-shows at
+// most STEP_CAP times). This changes only *presentation order* — the answer
+// queue `q` still gets one row per keypress with the real (ease, timeMs, epoch).
 //
 // Design ("ink & paper"): 120° progress dot-arc along the top bezel, question in
 // paper-white; on reveal the question dims to warm gray and the answer takes
@@ -24,21 +35,131 @@ import Toybox.Math;
 // the rest.
 class ReviewView extends WatchUi.View {
 
-    private var _cards as Array;
+    // A card re-shows at most this many times per session (guarantees the
+    // sitting terminates even if every answer is "Again").
+    private const STEP_CAP = 3;
+    // Intervals at/above this (~90 min: hours, days, months) can't come due in
+    // a sitting — treated as end-of-session via learn-ahead.
+    private const SESSION_LONG = 5400000;
+    private const DEFAULT_STEP = 60000; // fallback when nt1 is empty/unknown
+
+    private var _new as Array;          // unseen cards, cursor _ni
+    private var _ni as Number = 0;
+    private var _learn as Array = [];   // entries [dueMs, card, stepIdx]
+    private var _cur as Array or Null;  // card currently on screen
+    private var _curStep as Number = 0; // times _cur has already been failed
     private var _deckName as String;
-    private var _i as Number = 0;
     private var _showAnswer as Boolean = false;
     private var _done as Number = 0;
     private var _startMs as Number;
     private var _cardStartMs as Number;
-    private var _repeats = {};
 
     function initialize(cards as Array, deckName as String) {
         View.initialize();
-        _cards = cards;
+        _new = cards;
         _deckName = deckName;
         _startMs = System.getTimer();
         _cardStartMs = _startMs;
+        _pick(); // caller (DeckMenu) guarantees cards is non-empty
+    }
+
+    // Pick the next card into _cur/_curStep. Returns false when the session is
+    // exhausted (no new cards, no pending learn cards).
+    private function _pick() as Boolean {
+        var t = System.getTimer();
+        var bi = _soonestLearn();
+        if (bi >= 0 && (_learn[bi] as Array)[0] <= t) {
+            var e = _removeLearn(bi);
+            _cur = e[1];
+            _curStep = e[2];
+            return true;
+        }
+        if (_ni < _new.size()) {
+            _cur = _new[_ni];
+            _ni++;
+            _curStep = 0;
+            return true;
+        }
+        if (bi >= 0) { // learn-ahead: no new cards left, show the soonest early
+            var e = _removeLearn(bi);
+            _cur = e[1];
+            _curStep = e[2];
+            return true;
+        }
+        _cur = null;
+        return false;
+    }
+
+    // Index of the learn entry with the earliest due, or -1 when empty.
+    private function _soonestLearn() as Number {
+        if (_learn.size() == 0) {
+            return -1;
+        }
+        var best = 0;
+        for (var k = 1; k < _learn.size(); k++) {
+            if ((_learn[k] as Array)[0] < (_learn[best] as Array)[0]) {
+                best = k;
+            }
+        }
+        return best;
+    }
+
+    private function _removeLearn(idx as Number) as Array {
+        var e = _learn[idx] as Array;
+        var out = [];
+        for (var k = 0; k < _learn.size(); k++) {
+            if (k != idx) {
+                out.add(_learn[k]);
+            }
+        }
+        _learn = out;
+        return e;
+    }
+
+    // AnkiDroid next-interval label (e.g. "<1 min", "10 min", "3 d") → ms.
+    // Days/months and anything ≥ SESSION_LONG are clamped so they only surface
+    // via learn-ahead at the end; the "<" prefix shortens below one unit.
+    private function _parseInterval(lbl) as Number {
+        if (!(lbl instanceof String) || lbl.length() == 0) {
+            return DEFAULT_STEP;
+        }
+        var mult;
+        if (lbl.find("mo") != null || lbl.find("yr") != null ||
+            lbl.find("d") != null || lbl.find("h") != null) {
+            return SESSION_LONG; // hours+ won't come due in a sitting
+        } else if (lbl.find("min") != null || lbl.find("m") != null) {
+            mult = 60000;
+        } else if (lbl.find("s") != null) {
+            mult = 1000;
+        } else {
+            mult = 60000;
+        }
+        var n = 0;
+        var seen = false;
+        var chars = lbl.toCharArray();
+        for (var i = 0; i < chars.size(); i++) {
+            var cn = (chars[i] as Char).toNumber();
+            if (cn >= 48 && cn <= 57) {
+                n = n * 10 + (cn - 48);
+                seen = true;
+            } else if (seen) {
+                break;
+            }
+        }
+        if (!seen) {
+            n = 1; // e.g. a bare "<min"; "<1 min" already carries the 1
+        }
+        var ms = n * mult;
+        if (lbl.find("<") != null && ms > 30000) {
+            ms = 30000; // "<1 min" → ~30 s, back sooner than a full minute
+        }
+        if (ms < 5000) {
+            ms = 5000; // floor: never reappear effectively instantly
+        }
+        if (ms > SESSION_LONG) {
+            ms = SESSION_LONG;
+        }
+        return ms;
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -48,15 +169,23 @@ class ReviewView extends WatchUi.View {
         var w = dc.getWidth();
         var h = dc.getHeight();
         var cx = w / 2;
-        var card = _cards[_i];
+        if (_cur == null) {
+            return;
+        }
+        var card = _cur;
+
+        // Progress over a queue that grows on each miss: done vs. what's left
+        // (current card + unseen new + pending learn). The denominator climbs
+        // when you fail a card — honest, since there is now more to do.
+        var remaining = (_new.size() - _ni) + _learn.size();
+        var known = _done + 1 + remaining;
 
         // Session progress: dots arc along the top bezel (150°→30°, 16 dots).
         // Inset 15 px from edge so dots clear the UP-button area.
         var r = cx - 15;
         var cy = h / 2;
-        var frac = _cards.size() > 0 ? _i.toFloat() / _cards.size() : 0.0;
-        var doneDots = (_cards.size() > 0)
-            ? (_i * 15 / _cards.size())  // 0..15 range for 16 dots (indices 0..15)
+        var doneDots = known > 0
+            ? (_done * 15 / known)  // 0..15 range for 16 dots (indices 0..15)
             : -1;
         for (var di = 0; di < 16; di++) {
             var angleDeg = 150.0 - (120.0 * di / 15.0);
@@ -73,7 +202,7 @@ class ReviewView extends WatchUi.View {
 
         dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 6 / 100, Graphics.FONT_XTINY,
-            (_i + 1).toString() + "/" + _cards.size().toString(),
+            (_done + 1).toString() + "/" + known.toString(),
             Graphics.TEXT_JUSTIFY_CENTER);
 
         if (!_showAnswer) {
@@ -142,7 +271,7 @@ class ReviewView extends WatchUi.View {
     // card actions are filtered by the companion-pushed "cardActions" list
     // (SCHEMA.md §8) — absent list means all four.
     function openMenu() as Void {
-        var card = _cards[_i];
+        var card = _cur;
         var nt = card[6] as Array;
         var menu = new WatchUi.ActionMenu({});
         var items = 0;
@@ -199,26 +328,29 @@ class ReviewView extends WatchUi.View {
     }
 
     function grade(ease as Number) as Void {
-        var card = _cards[_i];
-        var timeMs = System.getTimer() - _cardStartMs;
+        var card = _cur;
+        var t = System.getTimer();
+        var timeMs = t - _cardStartMs;
         if (timeMs > 60000) {
             timeMs = 60000;
         }
         CardStore.queueRow(["a", card[0], card[1], card[2], ease, timeMs, Time.now().value()]);
         _done++;
-        if (ease == 1) {
-            var cid = card[0];
-            var n = _repeats.hasKey(cid) ? _repeats[cid] : 0;
-            if (n < 2) {
-                _repeats[cid] = n + 1;
-                _cards.add(card); // same-session second pass
-            }
+        // "Again" → back into the learning queue with a due timestamp derived
+        // from Anki's own Again interval (nt1). The step grows with each miss
+        // and STEP_CAP bounds re-shows so the session always terminates. Any
+        // grade ≥ Hard "graduates" the card — it simply isn't re-queued.
+        if (ease == 1 && _curStep < STEP_CAP) {
+            var nt = card[6] as Array;
+            var base = _parseInterval(nt.size() > 0 ? nt[0] : "");
+            var due = t + base * (_curStep + 1);
+            _learn.add([due, card, _curStep + 1]);
         }
         _advance();
     }
 
     private function _action(code as String) as Void {
-        var card = _cards[_i];
+        var card = _cur;
         CardStore.queueRow(["x", card[0], card[1], card[2], code]);
         if ("flag".equals(code)) {
             WatchUi.showToast(Rez.Strings.Flagged, null);
@@ -228,10 +360,9 @@ class ReviewView extends WatchUi.View {
     }
 
     private function _advance() as Void {
-        _i++;
         _showAnswer = false;
         _cardStartMs = System.getTimer();
-        if (_i >= _cards.size()) {
+        if (!_pick()) {
             endSession(true);
             return;
         }
