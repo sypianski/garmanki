@@ -24,6 +24,9 @@ module Theme {
     const ANG_START = 30;
     const ANG_UP    = 150;
     const ANG_DOWN  = 210;
+    // Non-button bezel positions used as status indicators (drawn only when
+    // there's something to say — a silent bezel means "everything's fine").
+    const ANG_LINK  = 180; // 9 o'clock: phone link health warning
 
     // Bezel tick / caption color for an Anki ease (1=Again … 4=Easy).
     function easeColor(ease as Number) as Number {

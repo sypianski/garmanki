@@ -5,8 +5,21 @@ import Toybox.Time;
 import Toybox.Time.Gregorian;
 import Toybox.WatchUi;
 
-// Landing screen — "ink & paper": hero due count inside a session ring,
-// amber tick at START (decks). Hold UP (menu) re-sends hello.
+// Landing screen — "ink & paper". Vertical hierarchy top→bottom:
+//
+//   ring         session momentum (done / (done + still due) today)
+//   hero         due count, or ✓ when all done for today
+//   split        new + rev breakdown of what's still due
+//   habit        N decks · N day streak
+//   sync-time    ALWAYS present: when last successful sync happened
+//   CTA          only when pend>0 OR phone off: what the user should do next
+//   version      footer
+//
+// Bezel language: amber tick at START (decks button) is always drawn — it is
+// the primary affordance. A muted tick at 9 o'clock appears only when the
+// phone is out of reach AND there's outstanding work; a silent bezel means
+// "you don't have to do anything". Colors are the language: PAPER = primary
+// state, MUTED = ambient, ACCENT = actionable. Hold UP re-sends hello.
 class HomeView extends WatchUi.View {
 
     function initialize() {
@@ -24,8 +37,13 @@ class HomeView extends WatchUi.View {
         var decks = CardStore.getDecks();
         var stats = CardStore.getStats(); // [doneToday, streak]
         var remaining = 0;
+        var nNew = 0;
+        var nRev = 0;
         for (var i = 0; i < decks.size(); i++) {
-            remaining += CardStore.cardsForDeck(decks[i][0]).size();
+            var d = decks[i] as Array;
+            remaining += CardStore.cardsForDeck(d[0] as Number).size();
+            if (d.size() > 3 && d[3] instanceof Number) { nNew += d[3] as Number; }
+            if (d.size() > 5 && d[5] instanceof Number) { nRev += d[5] as Number; }
         }
 
         // Ring shows today's momentum: done / (done + still due).
@@ -44,74 +62,122 @@ class HomeView extends WatchUi.View {
                 :color => Theme.PAPER,
                 :font => [Graphics.FONT_SMALL, Graphics.FONT_TINY, Graphics.FONT_XTINY],
                 :locX => w / 6,
-                :locY => h * 34 / 100,
+                :locY => h * 28 / 100,
                 :width => w * 2 / 3,
-                :height => h * 30 / 100,
+                :height => h * 28 / 100,
                 :justification => Graphics.TEXT_JUSTIFY_CENTER
             });
             ta.draw(dc);
+        } else if (remaining == 0 && done > 0) {
+            // "Done for today" state — the hero has to communicate rest, not
+            // an ambiguous zero. Checkmark glyph + subtitle count.
+            dc.setColor(Theme.GOOD, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 24 / 100, Graphics.FONT_NUMBER_MEDIUM,
+                "✓", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 46 / 100, Graphics.FONT_XTINY,
+                Theme.spaced(WatchUi.loadResource(Rez.Strings.HomeAllDone) as String),
+                Graphics.TEXT_JUSTIFY_CENTER);
+            _drawHabit(dc, cx, h * 56 / 100, decks.size(), stats);
         } else {
             // Hero: cards still due today.
             dc.setColor(Theme.PAPER, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 26 / 100, Graphics.FONT_NUMBER_MILD,
+            dc.drawText(cx, h * 24 / 100, Graphics.FONT_NUMBER_MILD,
                 remaining.toString(), Graphics.TEXT_JUSTIFY_CENTER);
+            // Split: "8 new · 12 rev" replaces the generic "due" caption. Only
+            // draws when either side is non-zero AND the sum matches remaining
+            // roughly — falls back to plain "due" otherwise so a stale/missing
+            // count never mislabels the hero.
             dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 46 / 100, Graphics.FONT_XTINY,
-                Theme.spaced(WatchUi.loadResource(Rez.Strings.HomeDue) as String),
-                Graphics.TEXT_JUSTIFY_CENTER);
-
-            // Deck + streak info line.
-            var base = decks.size().toString() + " "
-                + (WatchUi.loadResource(Rez.Strings.HomeDecks) as String).toLower();
-            var streak = stats[1] instanceof Number ? stats[1] : 0;
-            var full = base;
-            if (streak > 0) {
-                full += " · " + streak.toString() + " "
-                    + (WatchUi.loadResource(Rez.Strings.HomeStreak) as String);
+            var subLine = null;
+            if ((nNew + nRev) > 0) {
+                var parts = "";
+                if (nNew > 0) {
+                    parts = nNew.toString() + " "
+                        + (WatchUi.loadResource(Rez.Strings.HomeNew) as String);
+                }
+                if (nRev > 0) {
+                    if (parts.length() > 0) { parts += " · "; }
+                    parts += nRev.toString() + " "
+                        + (WatchUi.loadResource(Rez.Strings.HomeRev) as String);
+                }
+                subLine = parts;
             }
-            var lineY = h * 56 / 100;
-            var fontH = dc.getFontHeight(Graphics.FONT_XTINY);
-            var maxW = Theme.chordWidth(dc, lineY + fontH / 2, 8);
-            var line = dc.getTextWidthInPixels(full, Graphics.FONT_XTINY) <= maxW ? full : base;
-            dc.drawText(cx, lineY, Graphics.FONT_XTINY, line,
+            if (subLine == null) {
+                subLine = Theme.spaced(WatchUi.loadResource(Rez.Strings.HomeDue) as String);
+            }
+            dc.drawText(cx, h * 44 / 100, Graphics.FONT_XTINY, subLine,
                 Graphics.TEXT_JUSTIFY_CENTER);
+            _drawHabit(dc, cx, h * 54 / 100, decks.size(), stats);
         }
 
-        // Sync line — always visible; replaced by status while status is fresh.
-        // When idle, combines last-sync time with the unsynced-answer count so
-        // the user sees BOTH signals: how stale, how much still owed.
+        // Sync-time line — ALWAYS visible. This is the load-bearing signal for
+        // the user's mental model ("how stale is my state?"), so it never gets
+        // hidden behind the transient status or the CTA. Transient status is
+        // shown ABOVE it (accent), CTA is shown BELOW it (accent).
         var link = Link.get();
         var status = link.status;
         var statusFresh = status.length() > 0
             && (System.getTimer() - link.statusSetMs) < link.STATUS_TTL_MS;
+
+        var syncT = CardStore.getLastSyncTime();
+        var syncText = (syncT instanceof Number)
+            ? _syncLine(syncT as Number)
+            : (WatchUi.loadResource(Rez.Strings.SyncNever) as String);
+        dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, h * 66 / 100, Graphics.FONT_XTINY, syncText,
+            Graphics.TEXT_JUSTIFY_CENTER);
+
+        // Below the sync-time: transient status wins the accent slot (short
+        // "Sync requested" / "Answers delivered" flashes); otherwise the CTA
+        // tells the user what to do about outstanding work.
+        var pend = CardStore.pendingCount();
+        var phoneOn = System.getDeviceSettings().phoneConnected;
+        var ctaText = null;
         if (statusFresh) {
-            dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 74 / 100, Graphics.FONT_XTINY, status,
-                Graphics.TEXT_JUSTIFY_CENTER);
-        } else {
-            var syncT = CardStore.getLastSyncTime();
-            var pend = CardStore.pendingCount();
-            var syncStr = (syncT instanceof Number) ? _syncLine(syncT as Number) : null;
-            var unsyncStr = pend > 0
-                ? pend.toString() + " "
-                    + (WatchUi.loadResource(Rez.Strings.SyncUnsynced) as String)
-                : null;
-            var text;
-            if (syncStr != null && unsyncStr != null) {
-                text = syncStr + " · " + unsyncStr;
-            } else if (syncStr != null) {
-                text = syncStr;
-            } else if (unsyncStr != null) {
-                text = unsyncStr;
-            } else {
-                text = WatchUi.loadResource(Rez.Strings.SyncNever) as String;
+            ctaText = status;
+        } else if (pend > 0) {
+            var t = pend.toString() + " "
+                + (WatchUi.loadResource(Rez.Strings.SyncUnsynced) as String);
+            if (!phoneOn) {
+                t += " · " + (WatchUi.loadResource(Rez.Strings.SyncOpenPhone) as String);
             }
-            dc.setColor(pend > 0 ? Theme.PAPER : Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 74 / 100, Graphics.FONT_XTINY, text,
+            ctaText = t;
+        } else if (!phoneOn && !(syncT instanceof Number)) {
+            // Fresh install, phone still not around — say what to do.
+            ctaText = WatchUi.loadResource(Rez.Strings.SyncPhoneOff) as String;
+        }
+        if (ctaText != null) {
+            dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 76 / 100, Graphics.FONT_XTINY, ctaText,
                 Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         Theme.tick(dc, Theme.ANG_START, Theme.ACCENT);
+        // Phone-off warning tick — only when there IS something the phone
+        // could fix (outstanding answers or a fresh install with no data).
+        // Silent bezel when everything is fine.
+        if (!phoneOn && (pend > 0 || decks.size() == 0)) {
+            Theme.tick(dc, Theme.ANG_LINK, Theme.MUTED);
+        }
+    }
+
+    private function _drawHabit(dc as Dc, cx as Number, lineY as Number,
+            nDecks as Number, stats as Array) as Void {
+        var base = nDecks.toString() + " "
+            + (WatchUi.loadResource(Rez.Strings.HomeDecks) as String).toLower();
+        var streak = stats[1] instanceof Number ? stats[1] : 0;
+        var full = base;
+        if (streak > 0) {
+            full += " · " + streak.toString() + " "
+                + (WatchUi.loadResource(Rez.Strings.HomeStreak) as String);
+        }
+        var fontH = dc.getFontHeight(Graphics.FONT_XTINY);
+        var maxW = Theme.chordWidth(dc, lineY + fontH / 2, 8);
+        var line = dc.getTextWidthInPixels(full, Graphics.FONT_XTINY) <= maxW ? full : base;
+        dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, lineY, Graphics.FONT_XTINY, line,
+            Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     private function _syncLine(syncT as Number) as String {
