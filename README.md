@@ -6,9 +6,9 @@ over Connect IQ BLE messaging. The scheduler stays in AnkiDroid — the
 watch only shows cards and reports back how you did.
 
 <p>
-  <img src="docs/screenshots/watch-home.jpg" width="200" alt="Home screen: due count, new/rev split, unsynced count">
-  <img src="docs/screenshots/watch-card.jpg" width="200" alt="Card review screen">
-  <img src="docs/screenshots/companion-settings.jpg" width="200" alt="Android companion: watch button/gesture mapping settings">
+  <img src="docs/screenshots/watch-home.jpg" height="260" alt="Home screen: due count, new/rev split, unsynced count">
+  <img src="docs/screenshots/watch-card.jpg" height="260" alt="Card review screen">
+  <img src="docs/screenshots/companion-settings.jpg" height="260" alt="Android companion: watch button/gesture mapping settings">
 </p>
 
 ## Status
