@@ -114,8 +114,16 @@ module CardStore {
     }
 
     function getLastSyncTime() as Number? {
+        // Storage roundtrip may promote a Number epoch to Long on some CIQ
+        // runtimes (fr9xx has been observed doing this). Long is NOT a
+        // subtype of Number in Monkey C — both inherit Numeric — so a naive
+        // `instanceof Number` check silently dropped valid stamps, hiding
+        // the sync-time line on HomeView after a successful sync. Accept
+        // any Numeric and normalize down to Number.
         var t = Storage.getValue("lastSync");
-        return t instanceof Number ? t : null;
+        if (t instanceof Number) { return t; }
+        if (t instanceof Long) { return (t as Long).toNumber(); }
+        return null;
     }
 
     function setLastSyncTime(epochSec as Number) as Void {
