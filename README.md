@@ -5,6 +5,12 @@ an Android companion that bridges to [AnkiDroid](https://github.com/ankidroid/An
 over Connect IQ BLE messaging. The scheduler stays in AnkiDroid — the
 watch only shows cards and reports back how you did.
 
+<p>
+  <img src="docs/screenshots/watch-home.jpg" width="200" alt="Home screen: due count, new/rev split, unsynced count">
+  <img src="docs/screenshots/watch-card.jpg" width="200" alt="Card review screen">
+  <img src="docs/screenshots/companion-settings.jpg" width="200" alt="Android companion: watch button/gesture mapping settings">
+</p>
+
 ## Status
 
 The Android companion is currently in **beta on Google Play**. If you
@@ -22,11 +28,3 @@ The watch app is on the **Connect IQ Store**:
 
 See [SCHEMA.md](SCHEMA.md) for the watch↔phone data contract and
 [DECYZJE.md](DECYZJE.md) for product decisions.
-
-## Screenshots
-
-<p>
-  <img src="docs/screenshots/watch-home.jpg" width="280" alt="Home screen: due count, new/rev split, unsynced count">
-  <img src="docs/screenshots/watch-card.jpg" width="280" alt="Card review screen">
-  <img src="docs/screenshots/companion-settings.jpg" width="280" alt="Android companion: watch button/gesture mapping settings">
-</p>
