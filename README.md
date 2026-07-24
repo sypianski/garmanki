@@ -10,6 +10,9 @@ watch only shows cards and reports back how you did.
 The Android companion is currently in **beta on Google Play**. If you
 want to try it, request access here: **[sypian.ski/beta](https://sypian.ski/beta)**
 
+The watch app is on the **Connect IQ Store**:
+[apps.garmin.com/apps/cc2be8ee-1ea5-4797-b8b0-eb7109d93855](https://apps.garmin.com/apps/cc2be8ee-1ea5-4797-b8b0-eb7109d93855)
+
 ## Layout
 
 | Dir | What | Stack |
