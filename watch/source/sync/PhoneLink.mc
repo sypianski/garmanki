@@ -125,6 +125,10 @@ class PhoneLink {
         if (d["ok"] == true) {
             CardStore.dropFirst(_sentCount);
             CardStore.bumpBatch();
+            // Successful answer delivery is a sync event too — otherwise the
+            // home line shows "Not synced yet" for users whose only traffic is
+            // outgoing answers between phone-side state pushes.
+            CardStore.setLastSyncTime(Time.now().value());
             setStatus(WatchUi.loadResource(Rez.Strings.SyncAnswersOk) as String);
         }
         _sentBatch = null;

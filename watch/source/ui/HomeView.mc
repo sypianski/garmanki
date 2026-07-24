@@ -33,9 +33,6 @@ class HomeView extends WatchUi.View {
         var frac = (done + remaining) > 0 ? done.toFloat() / (done + remaining) : 0.0;
         Theme.ring(dc, cx - 12, frac);
 
-        dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 12 / 100, Graphics.FONT_XTINY,
-            Theme.spaced("Garmanki"), Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 89 / 100, Graphics.FONT_XTINY,
             "v" + (WatchUi.loadResource(Rez.Strings.AppVersion) as String),
@@ -78,19 +75,11 @@ class HomeView extends WatchUi.View {
             var line = dc.getTextWidthInPixels(full, Graphics.FONT_XTINY) <= maxW ? full : base;
             dc.drawText(cx, lineY, Graphics.FONT_XTINY, line,
                 Graphics.TEXT_JUSTIFY_CENTER);
-
-            // Pending answers — own line when non-zero.
-            var pend = CardStore.pendingCount();
-            if (pend > 0) {
-                dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cx, h * 64 / 100, Graphics.FONT_XTINY,
-                    pend.toString() + " "
-                        + (WatchUi.loadResource(Rez.Strings.HomePending) as String),
-                    Graphics.TEXT_JUSTIFY_CENTER);
-            }
         }
 
         // Sync line — always visible; replaced by status while status is fresh.
+        // When idle, combines last-sync time with the unsynced-answer count so
+        // the user sees BOTH signals: how stale, how much still owed.
         var link = Link.get();
         var status = link.status;
         var statusFresh = status.length() > 0
@@ -101,11 +90,24 @@ class HomeView extends WatchUi.View {
                 Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             var syncT = CardStore.getLastSyncTime();
-            dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx, h * 74 / 100, Graphics.FONT_XTINY,
-                syncT instanceof Number
-                    ? _syncLine(syncT as Number)
-                    : (WatchUi.loadResource(Rez.Strings.SyncNever) as String),
+            var pend = CardStore.pendingCount();
+            var syncStr = (syncT instanceof Number) ? _syncLine(syncT as Number) : null;
+            var unsyncStr = pend > 0
+                ? pend.toString() + " "
+                    + (WatchUi.loadResource(Rez.Strings.SyncUnsynced) as String)
+                : null;
+            var text;
+            if (syncStr != null && unsyncStr != null) {
+                text = syncStr + " · " + unsyncStr;
+            } else if (syncStr != null) {
+                text = syncStr;
+            } else if (unsyncStr != null) {
+                text = unsyncStr;
+            } else {
+                text = WatchUi.loadResource(Rez.Strings.SyncNever) as String;
+            }
+            dc.setColor(pend > 0 ? Theme.PAPER : Theme.MUTED, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 74 / 100, Graphics.FONT_XTINY, text,
                 Graphics.TEXT_JUSTIFY_CENTER);
         }
 
