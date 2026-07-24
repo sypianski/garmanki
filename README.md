@@ -28,4 +28,5 @@ See [SCHEMA.md](SCHEMA.md) for the watch↔phone data contract and
 <p>
   <img src="docs/screenshots/watch-home.jpg" width="280" alt="Home screen: due count, new/rev split, unsynced count">
   <img src="docs/screenshots/watch-card.jpg" width="280" alt="Card review screen">
+  <img src="docs/screenshots/companion-settings.jpg" width="280" alt="Android companion: watch button/gesture mapping settings">
 </p>
