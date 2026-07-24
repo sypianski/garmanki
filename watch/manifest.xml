@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iq:manifest version="3" xmlns:iq="http://www.garmin.com/xml/connectiq">
-    <iq:application id="b1b0cef8a5b246af9c8ea2951c2d6bba"
+    <iq:application id="af46d10eb5a3438082598ff6b6c7ffed"
                     entry="GarmankiApp"
                     launcherIcon="@Drawables.LauncherIcon"
                     name="@Strings.AppName"
