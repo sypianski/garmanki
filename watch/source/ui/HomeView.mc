@@ -213,7 +213,7 @@ class HomeView extends WatchUi.View {
         var timeStr = si.hour.format("%02d") + ":" + si.min.format("%02d");
         var mon = ["Jan","Feb","Mar","Apr","May","Jun",
                    "Jul","Aug","Sep","Oct","Nov","Dec"];
-        return si.day.toString() + " " + mon[(si.month as Number) - 1]
+        return "Last sync: " + si.day.toString() + " " + mon[(si.month as Number) - 1]
             + " " + timeStr;
     }
 }
