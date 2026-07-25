@@ -162,6 +162,46 @@ class ReviewView extends WatchUi.View {
         return ms;
     }
 
+    // Ekran zegarka mieści realnie dwa pola. Pierwsza niepusta linia to pole
+    // główne, druga (jeśli jest) idzie pod spodem mniejsza i szara — resztę
+    // odrzucamy. HtmlToText.clean po stronie Androida gwarantuje, że pola
+    // Anki (div/br/p) trafiają tu rozdzielone \n.
+    private function _splitFields(text as String) as Array {
+        if (!(text instanceof String) || text.length() == 0) {
+            return ["", ""];
+        }
+        var primary = "";
+        var extra = "";
+        var chars = text.toCharArray();
+        var buf = "";
+        for (var i = 0; i < chars.size(); i++) {
+            var c = chars[i];
+            if (c.toString().equals("\n")) {
+                if (buf.length() > 0) {
+                    if (primary.length() == 0) {
+                        primary = buf;
+                    } else {
+                        extra = buf;
+                        break;
+                    }
+                    buf = "";
+                } else {
+                    buf = "";
+                }
+            } else {
+                buf += c.toString();
+            }
+        }
+        if (buf.length() > 0 && extra.length() == 0) {
+            if (primary.length() == 0) {
+                primary = buf;
+            } else {
+                extra = buf;
+            }
+        }
+        return [primary, extra];
+    }
+
     function onUpdate(dc as Dc) as Void {
         dc.setColor(Theme.BG, Theme.BG);
         dc.clear();
@@ -206,23 +246,41 @@ class ReviewView extends WatchUi.View {
             Graphics.TEXT_JUSTIFY_CENTER);
 
         if (!_showAnswer) {
+            var qp = _splitFields(card[4] as String);
+            var qExtra = qp[1] as String;
+            var qHasExtra = qExtra.length() > 0;
+            var qMainH = qHasExtra ? h * 50 / 100 : h * 68 / 100;
             var q = new WatchUi.TextArea({
-                :text => card[4] as String,
+                :text => qp[0] as String,
                 :color => Theme.PAPER,
                 :font => [Graphics.FONT_LARGE, Graphics.FONT_MEDIUM,
                           Graphics.FONT_SMALL, Graphics.FONT_TINY, Graphics.FONT_XTINY],
                 :locX => w / 10,
                 :locY => h * 16 / 100,
                 :width => w * 8 / 10,
-                :height => h * 68 / 100,
+                :height => qMainH,
                 :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
             });
             q.draw(dc);
+            if (qHasExtra) {
+                var qx = new WatchUi.TextArea({
+                    :text => qExtra,
+                    :color => Theme.MUTED,
+                    :font => [Graphics.FONT_TINY, Graphics.FONT_XTINY],
+                    :locX => w / 8,
+                    :locY => h * 68 / 100,
+                    :width => w * 3 / 4,
+                    :height => h * 16 / 100,
+                    :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+                });
+                qx.draw(dc);
+            }
             Theme.tick(dc, Theme.ANG_START, Theme.ACCENT);
         } else {
             // Question recedes, answer takes the ink.
+            var qp = _splitFields(card[4] as String);
             var q = new WatchUi.TextArea({
-                :text => card[4] as String,
+                :text => qp[0] as String,
                 :color => Theme.MUTED,
                 :font => [Graphics.FONT_TINY, Graphics.FONT_XTINY],
                 :locX => w / 8,
@@ -235,18 +293,35 @@ class ReviewView extends WatchUi.View {
             dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
             dc.fillRectangle(cx - Theme.px(dc, 22), h * 39 / 100,
                 Theme.px(dc, 44), Theme.px(dc, 3));
+            var ap = _splitFields(card[5] as String);
+            var aExtra = ap[1] as String;
+            var aHasExtra = aExtra.length() > 0;
+            var aMainH = aHasExtra ? h * 28 / 100 : h * 42 / 100;
             var a = new WatchUi.TextArea({
-                :text => card[5] as String,
+                :text => ap[0] as String,
                 :color => Theme.PAPER,
                 :font => [Graphics.FONT_LARGE, Graphics.FONT_MEDIUM,
                           Graphics.FONT_SMALL, Graphics.FONT_TINY, Graphics.FONT_XTINY],
                 :locX => w / 10,
                 :locY => h * 43 / 100,
                 :width => w * 8 / 10,
-                :height => h * 42 / 100,
+                :height => aMainH,
                 :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
             });
             a.draw(dc);
+            if (aHasExtra) {
+                var ax = new WatchUi.TextArea({
+                    :text => aExtra,
+                    :color => Theme.MUTED,
+                    :font => [Graphics.FONT_TINY, Graphics.FONT_XTINY],
+                    :locX => w / 8,
+                    :locY => h * 72 / 100,
+                    :width => w * 3 / 4,
+                    :height => h * 13 / 100,
+                    :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+                });
+                ax.draw(dc);
+            }
             // Ticks reflect the live mapping — button order: UP, DOWN, START.
             // Touch-first devices have no UP/DOWN pair; only the START tick.
             var events = DeviceProfile.HAS_UPDOWN_BUTTONS
