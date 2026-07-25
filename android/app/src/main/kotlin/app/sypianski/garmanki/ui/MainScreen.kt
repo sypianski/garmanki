@@ -539,13 +539,13 @@ private fun AnkiCard(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
-                val syncMs = settings?.lastAnkiSyncMs ?: 0L
+                val syncMs = settings?.lastGarminSyncMs ?: 0L
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        "Last sync:",
+                        "Last sync with Garmin:",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

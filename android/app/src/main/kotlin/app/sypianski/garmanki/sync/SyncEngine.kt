@@ -119,6 +119,7 @@ class SyncEngine(
             val result = ciq.push(chunks, rev)
             if (result is PushStatus.Done) {
                 prefs.setLastRev(rev)
+                prefs.setLastGarminSyncMs(clock())
             }
             _ui.value = UiState(busy = false, lastPush = result, skipped = skipped,
                 lastApplied = _ui.value.lastApplied)

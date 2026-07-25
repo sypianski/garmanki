@@ -22,6 +22,8 @@ data class Settings(
     /** epochDay → watch-originated answers applied that day (SCHEMA.md §7). */
     val replayLog: Map<Long, Int>,
     val lastAnkiSyncMs: Long,
+    /** Epoch-ms of last successful state push to the watch (PushStatus.Done). */
+    val lastGarminSyncMs: Long = 0L,
     /** Watch-UI config, SCHEMA.md §8: event → ease 1–4, 0 = no grade. */
     val actionMap: Map<String, Int> = SettingsStore.DEFAULT_ACTION_MAP,
     val cardActions: Set<String> = SettingsStore.ALL_CARD_ACTIONS,
@@ -37,6 +39,7 @@ interface SyncPrefs {
     suspend fun setLastAppliedBatch(batch: Int)
     suspend fun recordReplays(count: Int, epochDay: Long)
     suspend fun setLastAnkiSyncMs(ms: Long)
+    suspend fun setLastGarminSyncMs(ms: Long)
 }
 
 private val Context.dataStore by preferencesDataStore(name = "garmanki")
@@ -50,6 +53,7 @@ class SettingsStore(private val context: Context) : SyncPrefs {
         val lastAppliedBatch = intPreferencesKey("lastAppliedBatch")
         val replayLog = stringPreferencesKey("replayLog")
         val lastAnkiSyncMs = longPreferencesKey("lastAnkiSyncMs")
+        val lastGarminSyncMs = longPreferencesKey("lastGarminSyncMs")
         val actionMap = stringPreferencesKey("actionMap")
         val cardActions = stringSetPreferencesKey("cardActions")
         val guideReset = intPreferencesKey("guideReset")
@@ -68,6 +72,7 @@ class SettingsStore(private val context: Context) : SyncPrefs {
             lastAppliedBatch = p[Keys.lastAppliedBatch] ?: 0,
             replayLog = decodeLog(p[Keys.replayLog]),
             lastAnkiSyncMs = p[Keys.lastAnkiSyncMs] ?: 0L,
+            lastGarminSyncMs = p[Keys.lastGarminSyncMs] ?: 0L,
             actionMap = decodeActionMap(p[Keys.actionMap]),
             cardActions = p[Keys.cardActions] ?: ALL_CARD_ACTIONS,
             guideReset = p[Keys.guideReset] ?: 0,
@@ -95,6 +100,10 @@ class SettingsStore(private val context: Context) : SyncPrefs {
 
     override suspend fun setLastAnkiSyncMs(ms: Long) {
         context.dataStore.edit { it[Keys.lastAnkiSyncMs] = ms }
+    }
+
+    override suspend fun setLastGarminSyncMs(ms: Long) {
+        context.dataStore.edit { it[Keys.lastGarminSyncMs] = ms }
     }
 
     override suspend fun recordReplays(count: Int, epochDay: Long) {

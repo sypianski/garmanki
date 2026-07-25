@@ -88,6 +88,9 @@ private class FakePrefs(
     override suspend fun setLastAnkiSyncMs(ms: Long) {
         settings = settings.copy(lastAnkiSyncMs = ms)
     }
+    override suspend fun setLastGarminSyncMs(ms: Long) {
+        settings = settings.copy(lastGarminSyncMs = ms)
+    }
 }
 
 class SyncEngineTest {
