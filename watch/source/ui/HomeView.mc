@@ -129,8 +129,11 @@ class HomeView extends WatchUi.View {
         var syncT = CardStore.getLastSyncTime();
         var syncY = h * 62 / 100;
         if (syncT instanceof Number) {
+            var fh = dc.getFontHeight(Graphics.FONT_XTINY);
             dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, syncY, Graphics.FONT_XTINY,
+                "Last sync:", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(cx, syncY + fh, Graphics.FONT_XTINY,
                 _syncLine(syncT as Number), Graphics.TEXT_JUSTIFY_CENTER);
         }
 
@@ -213,7 +216,7 @@ class HomeView extends WatchUi.View {
         var timeStr = si.hour.format("%02d") + ":" + si.min.format("%02d");
         var mon = ["Jan","Feb","Mar","Apr","May","Jun",
                    "Jul","Aug","Sep","Oct","Nov","Dec"];
-        return "Last sync: " + si.day.toString() + " " + mon[(si.month as Number) - 1]
+        return si.day.toString() + " " + mon[(si.month as Number) - 1]
             + " " + timeStr;
     }
 }
