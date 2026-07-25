@@ -5,18 +5,22 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -28,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -39,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -51,6 +57,11 @@ import androidx.navigation.compose.rememberNavController
 import app.sypianski.garmanki.App
 import app.sypianski.garmanki.BuildConfig
 import app.sypianski.garmanki.R
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import app.sypianski.garmanki.anki.FlashCards
 import app.sypianski.garmanki.ciq.CiqState
 import app.sypianski.garmanki.ciq.PushStatus
@@ -186,7 +197,7 @@ internal fun ScreenScaffold(
 
 @Composable
 private fun ThemeCard(current: String, onSelect: (String) -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    AdaptiveCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -231,7 +242,7 @@ private fun ThemeOption(
 
 @Composable
 private fun LinkRow(label: String, onClick: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+    AdaptiveCard(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -274,12 +285,46 @@ private fun Masthead() {
     }
 }
 
+/**
+ * Switches between [OutlinedCard] (eink: black border, white fill, no shadow)
+ * and standard [Card] (dynamic theme: M3 elevated surface). Using OutlinedCard
+ * in eink is necessary because all surface containers are white — a plain Card
+ * would be invisible on a white background with no elevation shadow.
+ */
+@Composable
+internal fun AdaptiveCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    if (LocalEink.current) {
+        OutlinedCard(modifier = modifier) { content() }
+    } else {
+        Card(modifier = modifier) { content() }
+    }
+}
+
+/** Outlined-rectangle progress bar for eink: no grey track, just black fill on white. */
+@Composable
+internal fun EinkProgressBar(progress: Float, modifier: Modifier = Modifier) {
+    val shape = RoundedCornerShape(3.dp)
+    Box(
+        modifier = modifier
+            .height(8.dp)
+            .border(1.dp, Color.Black, shape)
+            .clip(shape),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(progress.coerceIn(0f, 1f))
+                .background(Color.Black),
+        )
+    }
+}
+
 @Composable
 internal fun SectionCard(
     title: String,
     content: @Composable () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    AdaptiveCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -294,12 +339,30 @@ internal fun SectionCard(
     }
 }
 
+/**
+ * Eink: filled circle = connected, empty outlined circle = disconnected.
+ * Dynamic theme: grade-green fill vs outline-colour fill (colour carries meaning).
+ */
 @Composable
-private fun StatusDot(color: Color) {
+private fun StatusDot(connected: Boolean) {
+    val isEink = LocalEink.current
     Box(
         modifier = Modifier
             .size(10.dp)
-            .background(color, CircleShape),
+            .then(
+                if (isEink) {
+                    if (connected)
+                        Modifier.background(Color.Black, CircleShape)
+                    else
+                        Modifier.border(1.5.dp, Color.Black, CircleShape)
+                } else {
+                    Modifier.background(
+                        if (connected) gradeColor(3)
+                        else MaterialTheme.colorScheme.outline,
+                        CircleShape,
+                    )
+                },
+            ),
     )
 }
 
@@ -311,6 +374,33 @@ internal fun LogLine(text: String, color: Color = MaterialTheme.colorScheme.onSu
         style = MaterialTheme.typography.bodyMedium.copy(fontFamily = MonoFamily),
         color = color,
     )
+}
+
+private fun relativeTime(epochMs: Long, now: Long): String {
+    if (epochMs <= 0L) return "—"
+    val deltaMin = (now - epochMs) / 60_000L
+    if (deltaMin < 1) return "przed chwilą"
+    if (deltaMin < 60) return "$deltaMin min temu"
+    val zone = ZoneId.systemDefault()
+    val nowDate = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+    val thenZdt = Instant.ofEpochMilli(epochMs).atZone(zone)
+    val thenDate = thenZdt.toLocalDate()
+    val timeStr = thenZdt.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+    if (thenDate == nowDate) return "dzisiaj $timeStr"
+    val daysDiff = ChronoUnit.DAYS.between(thenDate, nowDate)
+    if (daysDiff < 7) {
+        val dayName = when (thenDate.dayOfWeek) {
+            DayOfWeek.MONDAY -> "poniedziałek"
+            DayOfWeek.TUESDAY -> "wtorek"
+            DayOfWeek.WEDNESDAY -> "środa"
+            DayOfWeek.THURSDAY -> "czwartek"
+            DayOfWeek.FRIDAY -> "piątek"
+            DayOfWeek.SATURDAY -> "sobota"
+            DayOfWeek.SUNDAY -> "niedziela"
+        }
+        return "$dayName $timeStr"
+    }
+    return thenDate.format(DateTimeFormatter.ofPattern("d.MM.yyyy"))
 }
 
 @Composable
@@ -344,10 +434,7 @@ private fun WatchCard(state: CiqState, devices: List<WatchDevice>) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
-                            StatusDot(
-                                if (d.connected) gradeColor(3)
-                                else MaterialTheme.colorScheme.outline,
-                            )
+                            StatusDot(d.connected)
                             Column(Modifier.weight(1f)) {
                                 Text(
                                     d.name,
@@ -423,6 +510,7 @@ private fun AnkiCard(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
+                val isEink = LocalEink.current
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -433,12 +521,36 @@ private fun AnkiCard(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    LinearProgressIndicator(
-                        progress = { (streak.coerceAtMost(14)) / 14f },
-                        modifier = Modifier.weight(1f),
-                    )
+                    if (isEink) {
+                        EinkProgressBar(
+                            progress = (streak.coerceAtMost(14)) / 14f,
+                            modifier = Modifier.weight(1f),
+                        )
+                    } else {
+                        LinearProgressIndicator(
+                            progress = { (streak.coerceAtMost(14)) / 14f },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                     Text(
                         "$streak d",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                val syncMs = settings?.lastAnkiSyncMs ?: 0L
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        "Last sync:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        relativeTime(syncMs, System.currentTimeMillis()),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -458,7 +570,7 @@ private fun PushCard(
     lastApplied: Pair<Int, Int>?,
     onPush: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    AdaptiveCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),

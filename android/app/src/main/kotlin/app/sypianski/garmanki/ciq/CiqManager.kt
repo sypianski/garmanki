@@ -27,10 +27,29 @@ data class WatchDevice(
     val id: Long,
     val name: String,
     val status: IQDevice.IQDeviceStatus,
-    /** null = unknown / query in flight */
-    val appInstalled: Boolean?,
+    /**
+     * UUID of the garmanki variant confirmed present on this watch (public or
+     * beta), or null if none confirmed yet. This is the handle push/send must
+     * target — sending to the wrong variant's IQApp never reaches the watch.
+     */
+    val installedAppUuid: String? = null,
+    /** Variants the watch has explicitly reported as NOT installed. */
+    val notInstalled: Set<String> = emptySet(),
 ) {
     val connected: Boolean get() = status == IQDevice.IQDeviceStatus.CONNECTED
+
+    /**
+     * Tri-state install status combined across every known variant:
+     *   true  = some variant is present,
+     *   false = every variant reported absent,
+     *   null  = still querying / undetermined.
+     */
+    val appInstalled: Boolean?
+        get() = when {
+            installedAppUuid != null -> true
+            notInstalled.containsAll(WATCH_APP_UUIDS) -> false
+            else -> null
+        }
 }
 
 sealed interface PushStatus {
@@ -175,18 +194,20 @@ class CiqManager(private val appContext: Context) : CiqLink {
                     runCatching { ciq.getDeviceStatus(d) }.getOrNull()
                         ?: IQDevice.IQDeviceStatus.UNKNOWN
                 }
-                WatchDevice(d.deviceIdentifier, d.friendlyName ?: "Garmin", status, null)
+                WatchDevice(d.deviceIdentifier, d.friendlyName ?: "Garmin", status)
             }
-            val app = IQApp(WATCH_APP_UUID)
             known.forEach { d ->
                 runCatching {
                     ciq.registerForDeviceEvents(d) { dev, status ->
                         updateDevice(dev.deviceIdentifier) { it.copy(status = status) }
                     }
                 }
-                // Permanent app-event listener: hello/answers can arrive at
-                // any moment while the process is alive (SCHEMA.md §7).
-                runCatching { ciq.registerForAppEvents(d, app, appEventListener) }
+                // Permanent app-event listener, one per variant: hello/answers
+                // can arrive at any moment while the process is alive (SCHEMA.md
+                // §7), and we don't yet know which variant is flashed.
+                WATCH_APP_UUIDS.forEach { uuid ->
+                    runCatching { ciq.registerForAppEvents(d, IQApp(uuid), appEventListener) }
+                }
                 queryAppInstalled(ciq, d)
             }
         } catch (t: Throwable) {
@@ -195,19 +216,33 @@ class CiqManager(private val appContext: Context) : CiqLink {
     }
 
     private fun queryAppInstalled(ciq: ConnectIQ, device: IQDevice) {
-        try {
-            ciq.getApplicationInfo(WATCH_APP_UUID, device,
-                object : ConnectIQ.IQApplicationInfoListener {
-                    override fun onApplicationInfoReceived(app: IQApp?) {
-                        updateDevice(device.deviceIdentifier) { it.copy(appInstalled = true) }
-                    }
+        // Query every known variant; whichever the watch confirms wins. Public
+        // is queried first (WATCH_APP_UUIDS order) so it's preferred when a
+        // watch somehow has both flashed.
+        WATCH_APP_UUIDS.forEach { uuid ->
+            try {
+                ciq.getApplicationInfo(uuid, device,
+                    object : ConnectIQ.IQApplicationInfoListener {
+                        override fun onApplicationInfoReceived(app: IQApp?) {
+                            updateDevice(device.deviceIdentifier) {
+                                // Keep an already-set primary; only fill if empty.
+                                if (it.installedAppUuid == null || uuid == WATCH_APP_UUID) {
+                                    it.copy(installedAppUuid = uuid)
+                                } else {
+                                    it
+                                }
+                            }
+                        }
 
-                    override fun onApplicationNotInstalled(applicationId: String?) {
-                        updateDevice(device.deviceIdentifier) { it.copy(appInstalled = false) }
-                    }
-                })
-        } catch (t: Throwable) {
-            // leave appInstalled = null (unknown)
+                        override fun onApplicationNotInstalled(applicationId: String?) {
+                            updateDevice(device.deviceIdentifier) {
+                                it.copy(notInstalled = it.notInstalled + uuid)
+                            }
+                        }
+                    })
+            } catch (t: Throwable) {
+                // leave this variant undetermined (unknown)
+            }
         }
     }
 
@@ -228,10 +263,10 @@ class CiqManager(private val appContext: Context) : CiqLink {
     override suspend fun push(chunks: List<Map<String, Any?>>, rev: Int): PushStatus {
         if (pushing) return PushStatus.Failed(PushFailure.BUSY)
         val ciq = readyCiq() ?: return fail(PushFailure.SDK, "SDK not ready")
-        val target = pickTarget() ?: return fail(PushFailure.NO_TARGET)
+        val (target, appUuid) = pickTarget() ?: return fail(PushFailure.NO_TARGET)
 
         pushing = true
-        val app = IQApp(WATCH_APP_UUID)
+        val app = IQApp(appUuid)
         val ack = CompletableDeferred<Pair<Boolean, String?>>()
         pendingAck = rev to ack
         try {
@@ -263,20 +298,24 @@ class CiqManager(private val appContext: Context) : CiqLink {
     /** Fire-and-forget single message (answers-ack). */
     override fun send(message: Map<String, Any?>) {
         val ciq = readyCiq() ?: return
-        val target = pickTarget() ?: return
+        val (target, appUuid) = pickTarget() ?: return
         try {
-            ciq.sendMessage(target, IQApp(WATCH_APP_UUID), message) { _, _, _ -> }
+            ciq.sendMessage(target, IQApp(appUuid), message) { _, _, _ -> }
         } catch (t: Throwable) {
             // lost — the watch re-flushes with the same batch id
         }
     }
 
-    private fun pickTarget(): IQDevice? {
+    /** Chosen device plus the variant UUID to address it by. */
+    private fun pickTarget(): Pair<IQDevice, String>? {
         // appInstalled may still be null (query in flight) right after init —
         // don't block on it, only skip devices confirmed app-less.
         val info = _devices.value.firstOrNull { it.connected && it.appInstalled != false }
             ?: return null
-        return knownDevices.firstOrNull { it.deviceIdentifier == info.id }
+        val device = knownDevices.firstOrNull { it.deviceIdentifier == info.id } ?: return null
+        // Address the confirmed variant; fall back to public while a query is
+        // still in flight (installedAppUuid null but not yet confirmed absent).
+        return device to (info.installedAppUuid ?: WATCH_APP_UUID)
     }
 
     private suspend fun sendChunk(

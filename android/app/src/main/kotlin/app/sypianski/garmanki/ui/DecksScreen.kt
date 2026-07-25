@@ -13,6 +13,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
@@ -155,10 +157,12 @@ private fun DecksCard(
                 color = MaterialTheme.colorScheme.primary,
             )
         }
+        val isEink = LocalEink.current
         Slider(
             value = limit.toFloat(),
             valueRange = 10f..100f,
             onValueChange = { onLimit(it.toInt()) },
+            colors = if (isEink) SliderDefaults.colors(inactiveTrackColor = Transparent) else SliderDefaults.colors(),
         )
     }
 }

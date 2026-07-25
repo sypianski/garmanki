@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Splash icon: samo logo na przezroczystym tle (splash bg =
-     @color/garmanki_window_bg, kolor kreski = @color/garmanki_logo,
-     oba z wariantem night). Kształt logo mieści się z zapasem wewnątrz
-     okrągłej maski systemowej splasha Androida 12+ (canvas 288dp,
-     widoczna maska ~192dp) — maska nie tnie żadnych widocznych pikseli. -->
+<!-- Splash icon: watch face with a fiszka split line — monochrome
+     stroke (kolor z @color/garmanki_logo, wariant night osobno). Kszta t
+     mie ci si  z zapasem wewn trz okr g ej maski systemowej splasha
+     Androida 12+ (canvas 288dp, widoczna maska ~192dp). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="288dp"
     android:height="288dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- bezel ring -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="@color/garmanki_logo"
         android:strokeWidth="3.4"
-        android:strokeLineCap="square"
-        android:strokeLineJoin="miter"
-        android:pathData="M 46,78 L 46,30 L 78,30 L 78,62 L 30,62 L 30,46 L 62,46 L 62,78 Z" />
+        android:strokeLineCap="round"
+        android:pathData="M 32,54 A 22,22 0 1 0 76,54 A 22,22 0 1 0 32,54 Z" />
+
+    <!-- fiszka split line across the face -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="@color/garmanki_logo"
+        android:strokeWidth="3.4"
+        android:strokeLineCap="round"
+        android:pathData="M 36,54 L 72,54" />
+
+    <!-- top strap lug -->
+    <path
+        android:fillColor="@color/garmanki_logo"
+        android:pathData="M 49,26 L 59,26 L 59,29 L 49,29 Z" />
+
+    <!-- bottom strap lug -->
+    <path
+        android:fillColor="@color/garmanki_logo"
+        android:pathData="M 49,79 L 59,79 L 59,82 L 49,82 Z" />
 </vector>

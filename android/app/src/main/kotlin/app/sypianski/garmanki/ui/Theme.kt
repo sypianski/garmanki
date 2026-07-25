@@ -52,32 +52,50 @@ private val DarkColors = darkColorScheme(
 )
 
 /**
- * E-ink "paper" scheme: pure black-on-white, flat, always light regardless of
- * the system dark mode. No gradients or shadows — outlines (kept black) do the
- * separating that elevation does elsewhere. Grade accents survive as the sole
- * colour (see [gradeColor] / [LocalEink]); everything else is greyscale.
+ * E-ink "paper" scheme: strictly binary — black (#000) or white (#FFF), no
+ * greys. Always light regardless of system dark mode. Outlines carry all the
+ * separating work that elevation does elsewhere; M3's entire surface-container
+ * family is pinned to white so the framework can't sneak in any tonal grey.
+ * Grade accents (see [gradeColor] / [LocalEink]) are the sole intentional
+ * colour; everything else is monochrome.
  */
 private val EinkColors = lightColorScheme(
     background = Color(0xFFFFFFFF),
     onBackground = Color(0xFF000000),
     surface = Color(0xFFFFFFFF),
     onSurface = Color(0xFF000000),
-    surfaceVariant = Color(0xFFECECEC),
-    onSurfaceVariant = Color(0xFF3A3A3A),
+    surfaceVariant = Color(0xFFFFFFFF),
+    onSurfaceVariant = Color(0xFF000000),
+    surfaceTint = Color(0xFFFFFFFF),
+    surfaceBright = Color(0xFFFFFFFF),
+    surfaceDim = Color(0xFFFFFFFF),
+    surfaceContainer = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFFFFFFF),
+    surfaceContainerHigh = Color(0xFFFFFFFF),
+    surfaceContainerHighest = Color(0xFFFFFFFF),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
     primary = Color(0xFF000000),
     onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFE0E0E0),
+    primaryContainer = Color(0xFFFFFFFF),
     onPrimaryContainer = Color(0xFF000000),
-    secondary = Color(0xFF2B2B2B),
+    secondary = Color(0xFF000000),
     onSecondary = Color(0xFFFFFFFF),
-    secondaryContainer = Color(0xFFE0E0E0),
+    secondaryContainer = Color(0xFFFFFFFF),
     onSecondaryContainer = Color(0xFF000000),
-    tertiary = Color(0xFF4A4A4A),
+    tertiary = Color(0xFF000000),
     onTertiary = Color(0xFFFFFFFF),
-    outline = Color(0xFF000000),
-    outlineVariant = Color(0xFFC4C4C4),
+    tertiaryContainer = Color(0xFFFFFFFF),
+    onTertiaryContainer = Color(0xFF000000),
     error = Color(0xFF000000),
     onError = Color(0xFFFFFFFF),
+    errorContainer = Color(0xFFFFFFFF),
+    onErrorContainer = Color(0xFF000000),
+    outline = Color(0xFF000000),
+    outlineVariant = Color(0xFF000000),
+    inverseSurface = Color(0xFF000000),
+    inverseOnSurface = Color(0xFFFFFFFF),
+    inversePrimary = Color(0xFFFFFFFF),
+    scrim = Color(0xFF000000),
 )
 
 /** True inside an e-ink themed subtree; forces [gradeColor] to its light branch. */
