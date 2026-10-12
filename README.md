@@ -68,3 +68,8 @@ Plain fēnix 6 / 6S (128 KB app RAM) are **not** supported yet.
 See [SCHEMA.md](SCHEMA.md) for the watch↔phone data contract and
 [DECYZJE.md](DECYZJE.md) for product decisions. The source is public:
 <https://github.com/sypianski/garmanki>.
+
+## License
+
+[MIT](LICENSE) © 2026 Jakub Sypiański. Third-party components (the Space Mono
+font) keep their own licenses, see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
