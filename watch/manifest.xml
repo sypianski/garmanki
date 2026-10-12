@@ -5,7 +5,7 @@
                     launcherIcon="@Drawables.LauncherIcon"
                     name="@Strings.AppName"
                     type="watch-app"
-                    minApiLevel="4.2.1">
+                    minApiLevel="3.4.0">
         <iq:products>
             <!-- AMOLED 454x454 -->
             <iq:product id="fr965"/>
@@ -42,6 +42,7 @@
             <!-- MIP 280x280 -->
             <iq:product id="fenix7x"/>
             <iq:product id="fenix7xpro"/>
+            <iq:product id="fenix6xpro"/>
             <iq:product id="fenix8solar51mm"/>
             <iq:product id="enduro3"/>
             <!-- MIP 260x260 -->
@@ -50,10 +51,12 @@
             <iq:product id="fr955"/>
             <iq:product id="fenix7"/>
             <iq:product id="fenix7pro"/>
+            <iq:product id="fenix6pro"/>
             <iq:product id="fenix8solar47mm"/>
             <!-- MIP 240x240 -->
             <iq:product id="fenix7s"/>
             <iq:product id="fenix7spro"/>
+            <iq:product id="fenix6spro"/>
             <!-- MIP 218x218 -->
             <iq:product id="fr255s"/>
             <iq:product id="fr255sm"/>

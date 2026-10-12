@@ -14,7 +14,7 @@ Architecture patterns are deliberately mirrored from
 
 | Dir | What | Stack |
 |---|---|---|
-| `watch/` | Connect IQ app (v1 target: fr965; minApiLevel 4.2.1) | Monkey C, SDK 9.x |
+| `watch/` | Connect IQ app (73 hw variants incl. fenix6 Pro-class; minApiLevel 3.4.0) | Monkey C, SDK 9.x |
 | `android/` | companion — AnkiDroid bridge + BLE push | Kotlin, Compose M3, CIQ Mobile SDK 2.4.0 |
 
 ## Commands
@@ -37,6 +37,9 @@ cd android && ./gradlew assembleRelease lint testDebugUnitTest
   2026-07-24; store version 1.2.2 = `AppVersion` (checked 2026-10-12 on
   the public page; manifest UUID `af46d10eb5a3438082598ff6b6c7ffed`).
   Keep the store version >= `AppVersion` when releasing.
+  **1.2.3 submitted 2026-10-12** (adds fenix6pro/6spro/6xpro, TASK-26);
+  the public page keeps showing 1.2.2 until Garmin approves it (~3 days).
+  Plain fenix6/fenix6s (128 KB app RAM) are deliberately NOT supported yet.
 - Old beta 0.1.0 uploaded 2026-07-22: store app id
   `cc2be8ee-1ea5-4797-b8b0-eb7109d93855`
   (https://apps.garmin.com/apps/cc2be8ee-1ea5-4797-b8b0-eb7109d93855) —

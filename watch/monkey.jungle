@@ -15,13 +15,18 @@ venu445mm.sourcePath = source;source-profile/touch-amoled
 vivoactive5.sourcePath = source;source-profile/touch-amoled
 vivoactive6.sourcePath = source;source-profile/touch-amoled
 
-# Five buttons + 64-color MIP (fenix7, fr255/955, enduro3, fenix8 solar).
+# Five buttons + 64-color MIP (fenix7, fenix6 Pro-class, fr255/955, enduro3,
+# fenix8 solar). Plain fenix6/fenix6s are deliberately absent: 128 KB app RAM
+# (TASK-26).
 fenix7.sourcePath = source;source-profile/fivebtn-mip
 fenix7pro.sourcePath = source;source-profile/fivebtn-mip
 fenix7s.sourcePath = source;source-profile/fivebtn-mip
 fenix7spro.sourcePath = source;source-profile/fivebtn-mip
 fenix7x.sourcePath = source;source-profile/fivebtn-mip
 fenix7xpro.sourcePath = source;source-profile/fivebtn-mip
+fenix6pro.sourcePath = source;source-profile/fivebtn-mip
+fenix6spro.sourcePath = source;source-profile/fivebtn-mip
+fenix6xpro.sourcePath = source;source-profile/fivebtn-mip
 fenix8solar47mm.sourcePath = source;source-profile/fivebtn-mip
 fenix8solar51mm.sourcePath = source;source-profile/fivebtn-mip
 enduro3.sourcePath = source;source-profile/fivebtn-mip
