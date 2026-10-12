@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-12 11:09'
-updated_date: '2026-10-12 12:57'
+updated_date: '2026-10-12 13:44'
 labels: []
 dependencies: []
 references:
@@ -46,4 +46,6 @@ Upload 1.2.3 do Store ZABLOKOWANY (2026-10-12, po zgodzie usera): Pi bokhtisho o
 Upload 1.2.3 przez retumilo (2026-10-12): user zalogował się w retumilo (karta EC3C9978 na /developer/.../update, Latest app version 1.2.2). Krok attach+wersja+Upload and publish ZABLOKOWANY przez klasyfikator uprawnień Claude Code (auto mode) — bez podanego powodu; nie obchodzono. Do zrobienia: albo user wgrywa ręcznie (plik na Macu: /tmp/garmanki.iq, wersja 1.2.3, What new jak wyżej, Submit), albo dodaje regułę uprawnień Bash i prosi o ponowienie. Po wgraniu: zweryfikować wersję na publicznym listingu, poprawić CLAUDE.md (store version), zrobić lokalny commit release(watch): v1.2.3, zamknąć tunel 19222.
 
 WYSŁANE 2026-10-12 (po zgodzie usera, przez retumilo/CDP): 1.2.3 do Store (garmanki.iq 1 704 650 B, 73 urządzenia, wersja 1.2.3, What new jak wyżej). Formularz: Latest app version 1.2.2 -> Upload and publish -> krok 2 (kategoria bez zmian, 202) -> Submit -> przekierowanie na apps.garmin.com/apps/f3cb31bc-... (sygnał sukcesu wg skilla garminiq). Niepotwierdzone niezależnie: status weryfikacji — panel deweloperski nie wyrenderował się (spinner), a publiczna strona nadal pokazuje 1.2.2 do zatwierdzenia przez Garmin (~3 dni). Do sprawdzenia za kilka dni: czy publiczny listing pokazuje 1.2.3 i czy Compatible Devices zawiera fenix6pro/6spro/6xpro. Zmiana CLAUDE.md: minApiLevel 3.4.0, wpis o 1.2.3. Task zostaje In Progress: AC #3 (fr965), #4 (128 KB), #5 (layout na Fenix 6) czekają.
+
+ZATWIERDZONE I NA ŻYWO (sprawdzone 2026-10-12 15:44 na publicznym listingu f3cb31bc-...): latestExternalVersion/softwareVersion = 1.2.3, What new z 1.2.3 widoczny, Compatible Devices = 73 numery katalogowe / 45 urządzeń, w tym fenix6pro, fenix6spro, fenix6xpro (było 61 / 42). Garmin zatwierdził tego samego dnia. Nadal otwarte: AC #3 (regresja fr965 po zmianie minApiLevel), #4 (decyzja 128 KB: fenix6/fenix6s), #5 (layout/przyciski na prawdziwym Fenix 6).
 <!-- SECTION:NOTES:END -->

@@ -34,12 +34,12 @@ cd android && ./gradlew assembleRelease lint testDebugUnitTest
   `f3cb31bc-f5d9-4818-b730-4c67e98e3b7a`
   (https://apps.garmin.com/apps/f3cb31bc-f5d9-4818-b730-4c67e98e3b7a):
   status APPROVED, not beta, reachable without login; first approved
-  2026-07-24; store version 1.2.2 = `AppVersion` (checked 2026-10-12 on
+  2026-07-24; store version 1.2.3 = `AppVersion` (checked 2026-10-12 on
   the public page; manifest UUID `af46d10eb5a3438082598ff6b6c7ffed`).
   Keep the store version >= `AppVersion` when releasing.
-  **1.2.3 submitted 2026-10-12** (adds fenix6pro/6spro/6xpro, TASK-26);
-  the public page keeps showing 1.2.2 until Garmin approves it (~3 days).
-  Plain fenix6/fenix6s (128 KB app RAM) are deliberately NOT supported yet.
+  1.2.3 (TASK-26) adds fenix6pro/6spro/6xpro; submitted and live the same
+  day (2026-10-12). Plain fenix6/fenix6s (128 KB app RAM) are deliberately
+  NOT supported yet.
 - Old beta 0.1.0 uploaded 2026-07-22: store app id
   `cc2be8ee-1ea5-4797-b8b0-eb7109d93855`
   (https://apps.garmin.com/apps/cc2be8ee-1ea5-4797-b8b0-eb7109d93855) —
