@@ -32,9 +32,9 @@ or Garmin.
 
 ## Supported watches
 
-Tested **only on the Forerunner 965**. The other models compile (the
-export build covers 73 hardware variants) but have not been checked on
-real hardware.
+Tested **only on the Forerunner 965**. The app is built for 45 watch
+models (73 hardware variants, counted by Garmin part number); the other
+models compile but have not been checked on real hardware.
 
 - **Forerunner** — 165 / 165 Music, 255 / 255s (and Music), 265 / 265s,
   570 (42 / 47 mm), 955, 965, 970
@@ -62,7 +62,7 @@ Plain fēnix 6 / 6S (128 KB app RAM) are **not** supported yet.
 
 | Dir | What | Stack |
 |---|---|---|
-| `watch/` | Connect IQ app (73 hw variants incl. fenix6 Pro-class; minApiLevel 3.4.0) | Monkey C, SDK 9.x |
+| `watch/` | Connect IQ app (45 models / 73 hw variants incl. fenix6 Pro-class; minApiLevel 3.4.0) | Monkey C, SDK 9.x |
 | `android/` | companion — AnkiDroid bridge + BLE push | Kotlin, Compose M3, CIQ Mobile SDK 2.4.0 |
 
 See [SCHEMA.md](SCHEMA.md) for the watch↔phone data contract and
