@@ -28,9 +28,16 @@ cd watch && monkeyc -f monkey.jungle -d fr965 -o bin/garmanki.prg -y developer_k
 cd android && ./gradlew assembleRelease lint testDebugUnitTest
 ```
 
-## Connect IQ Store (beta)
+## Connect IQ Store
 
-- Beta 0.1.0 uploaded 2026-07-22: store app id
+- **Public listing** — store app id
+  `f3cb31bc-f5d9-4818-b730-4c67e98e3b7a`
+  (https://apps.garmin.com/apps/f3cb31bc-f5d9-4818-b730-4c67e98e3b7a):
+  status APPROVED, not beta, reachable without login; first approved
+  2026-07-24; store version 1.2.2 = `AppVersion` (checked 2026-10-12 on
+  the public page; manifest UUID `af46d10eb5a3438082598ff6b6c7ffed`).
+  Keep the store version >= `AppVersion` when releasing.
+- Old beta 0.1.0 uploaded 2026-07-22: store app id
   `cc2be8ee-1ea5-4797-b8b0-eb7109d93855`
   (https://apps.garmin.com/apps/cc2be8ee-1ea5-4797-b8b0-eb7109d93855) —
   visible only to the developer account, "Beta Apps" section of the
