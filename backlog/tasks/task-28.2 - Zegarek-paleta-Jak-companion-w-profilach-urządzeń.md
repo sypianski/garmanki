@@ -1,9 +1,11 @@
 ---
 id: TASK-28.2
 title: 'Zegarek: paleta ''Jak companion'' w profilach urządzeń'
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-23 18:00'
+updated_date: '2026-10-23 18:04'
 labels:
   - watch
   - ux
@@ -24,3 +26,9 @@ Pastelowe oceny i chłodne szarości z companiona (#EF9A9A #FFB74D #81C784 #64B5
 - [ ] #2 Kontrast tekstu MUTED/FAINT na czerni sprawdzony
 - [ ] #3 Build monkeyc przechodzi dla fr965, fenix7 i venu3
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Paleta z companiona w trzech DeviceProfile (AMOLED i dotyk: pełne hex; MIP: siatka 64 kolorów, pastelowe Again/Good). Build OK fr965/fenix7/venu3. Kontrast w słońcu i wygląd na zegarku niesprawdzone.
+<!-- SECTION:NOTES:END -->

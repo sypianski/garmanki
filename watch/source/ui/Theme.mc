@@ -4,9 +4,10 @@ import Toybox.Math;
 
 // Visual identity — "ink & paper on OLED".
 //
-// True black ground (AMOLED), warm paper-white ink, a single amber accent,
-// and color ticks on the bezel aligned with the physical buttons: the hint
-// system IS the hardware. Grade colors mirror Anki: red=Again, green=Good.
+// True black ground (AMOLED), cool paper-white ink, a single pale-blue accent
+// (palette shared with the Android companion), and color ticks on the bezel
+// aligned with the physical buttons: the hint system IS the hardware. Grade
+// colors mirror Anki: red=Again, green=Good.
 //
 // Palette and button angles come from DeviceProfile — one variant per
 // device family, selected in monkey.jungle via sourcePath.

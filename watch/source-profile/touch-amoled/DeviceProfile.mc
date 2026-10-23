@@ -13,14 +13,15 @@ module DeviceProfile {
     const ANG_DOWN  = 210;
     const ANG_LINK  = 180;
 
-    // "Ink & paper" palette — full 24-bit color on AMOLED.
+    // "Companion" palette — cool grays on true black, pastel grades shared with
+    // the Android app (TASK-28.2). Full 24-bit color on AMOLED.
     const BG     = 0x000000;
-    const PAPER  = 0xF5EFE3; // warm off-white "ink"
-    const MUTED  = 0x8A8478; // warm gray
-    const FAINT  = 0x2E2B26; // hairlines / idle ring
-    const ACCENT = 0xFFB300; // amber
-    const AGAIN  = 0xFF5A48;
-    const HARD   = 0xFF8C42; // muted orange (Anki convention)
-    const GOOD   = 0x4CD07D;
-    const EASY   = 0x4FA8D8; // calm blue (Anki convention)
+    const PAPER  = 0xE6EBF2; // cool off-white "ink"
+    const MUTED  = 0x8C97A6; // cool gray
+    const FAINT  = 0x25303B; // hairlines / idle ring
+    const ACCENT = 0xA9C7E4; // pale blue (M3 container tone)
+    const AGAIN  = 0xEF9A9A;
+    const HARD   = 0xFFB74D; // muted orange (Anki convention)
+    const GOOD   = 0x81C784;
+    const EASY   = 0x64B5F6; // calm blue (Anki convention)
 }
