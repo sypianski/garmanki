@@ -37,6 +37,9 @@ cd android && ./gradlew assembleRelease lint testDebugUnitTest
   2026-07-24; store version 1.2.3 = `AppVersion` (checked 2026-10-12 on
   the public page; manifest UUID `af46d10eb5a3438082598ff6b6c7ffed`).
   Keep the store version >= `AppVersion` when releasing.
+  1.3.0 (TASK-28, watch redesign) submitted via /update on 2026-10-23; right
+  after Submit the public page still showed Version 1.2.3 with the new
+  What's New (status Preview) — re-check that it flips to 1.3.0.
   1.2.3 (TASK-26) adds fenix6pro/6spro/6xpro; submitted and live the same
   day (2026-10-12). Plain fenix6/fenix6s (128 KB app RAM) are deliberately
   NOT supported yet.
