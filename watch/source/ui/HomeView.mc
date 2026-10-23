@@ -7,11 +7,12 @@ import Toybox.WatchUi;
 
 // Landing screen — "ink & paper". Vertical hierarchy top→bottom:
 //
-//   ring         session momentum (done / (done + still due) today)
+//   ring         today's work in three arcs: done / still new / still review
 //   hero         due count, or ✓ when all done for today
 //   split        new + rev breakdown of what's still due
 //   habit        N decks · N day streak
-//   sync-time    ALWAYS present: when last successful sync happened
+//   sync-time    ALWAYS present, one line: time of the last successful sync
+//                (date added only when it was not today)
 //   CTA          only when pend>0 OR phone off: what the user should do next
 //   version      footer
 //
@@ -46,10 +47,9 @@ class HomeView extends WatchUi.View {
             if (d.size() > 5 && d[5] instanceof Number) { nRev += d[5] as Number; }
         }
 
-        // Ring shows today's momentum: done / (done + still due).
+        // Ring shows today's work: done / still new / still review.
         var done = stats[0] instanceof Number ? stats[0] : 0;
-        var frac = (done + remaining) > 0 ? done.toFloat() / (done + remaining) : 0.0;
-        Theme.ring(dc, cx - 12, frac);
+        Theme.ringSplit(dc, cx - 12, done, remaining, nNew, nRev);
 
         dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 89 / 100, Graphics.FONT_XTINY,
@@ -129,12 +129,8 @@ class HomeView extends WatchUi.View {
         var syncT = CardStore.getLastSyncTime();
         var syncY = h * 62 / 100;
         if (syncT instanceof Number) {
-            var fh = dc.getFontHeight(Graphics.FONT_XTINY);
             dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, syncY, Graphics.FONT_XTINY,
-                WatchUi.loadResource(Rez.Strings.HomeLastSync) as String,
-                Graphics.TEXT_JUSTIFY_CENTER);
-            dc.drawText(cx, syncY + fh, Graphics.FONT_XTINY,
                 _syncLine(syncT as Number), Graphics.TEXT_JUSTIFY_CENTER);
         }
 
@@ -164,7 +160,7 @@ class HomeView extends WatchUi.View {
             ctaText = WatchUi.loadResource(Rez.Strings.SyncPhoneOff) as String;
         }
         if (ctaText != null) {
-            var ctaY = h * 74 / 100;
+            var ctaY = h * 70 / 100;
             var fontH = dc.getFontHeight(Graphics.FONT_XTINY);
             var ctaMax = Theme.chordWidth(dc, ctaY + fontH / 2, 8);
             if (dc.getTextWidthInPixels(ctaText, Graphics.FONT_XTINY) > ctaMax
@@ -224,14 +220,21 @@ class HomeView extends WatchUi.View {
     }
 
     private function _syncLine(syncT as Number) as String {
-        // Always shape: "D MMM HH:MM" (e.g. "24 Jul 14:32"). The user's mental
-        // model of "how stale is my state" needs a concrete date, not a
-        // relative phrase like "just now" or "Yesterday" — those hide the
-        // one number that matters when something is actually wrong. The month
-        // abbreviation comes from FORMAT_MEDIUM, so it follows the watch language.
+        // "Synced HH:MM" when the sync was today, "Synced D MMM HH:MM" when it
+        // was earlier. A concrete time/date, never a relative phrase like
+        // "just now" — that hides the one number that matters when something
+        // is actually wrong. The month abbreviation comes from FORMAT_MEDIUM,
+        // so it follows the watch language.
         var si = Gregorian.info(new Time.Moment(syncT), Time.FORMAT_MEDIUM);
+        var now = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
         var timeStr = si.hour.format("%02d") + ":" + si.min.format("%02d");
-        return si.day.toString() + " " + si.month + " " + timeStr;
+        var word = WatchUi.loadResource(Rez.Strings.HomeSynced) as String;
+        var sameDay = si.day == now.day && si.year == now.year
+            && (si.month as String).equals(now.month as String);
+        if (sameDay) {
+            return word + " " + timeStr;
+        }
+        return word + " " + si.day.toString() + " " + si.month + " " + timeStr;
     }
 }
 

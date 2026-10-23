@@ -79,6 +79,66 @@ module Theme {
         dc.setPenWidth(1);
     }
 
+    // Segmented progress ring for the home screen: today's work in three arcs
+    // clockwise from 12 o'clock — done (ACCENT), still-new (PAPER), still-review
+    // (MUTED) — so the ring reads without color. `remaining` is the real count
+    // of cards left; the new/rev counts come from the deck list and may not add
+    // up to it, so they are scaled to fit `remaining` instead of trusted.
+    function ringSplit(dc as Dc, r as Number, done as Number, remaining as Number,
+            nNew as Number, nRev as Number) as Void {
+        var cx = dc.getWidth() / 2;
+        var cy = dc.getHeight() / 2;
+        dc.setPenWidth(3);
+        dc.setColor(FAINT, Graphics.COLOR_TRANSPARENT);
+        dc.drawCircle(cx, cy, r);
+        var total = done + remaining;
+        if (total <= 0) {
+            dc.setPenWidth(1);
+            return;
+        }
+        var newPart = 0;
+        if (remaining > 0) {
+            var sum = nNew + nRev;
+            newPart = sum > 0 ? remaining * nNew / sum : remaining;
+        }
+        var revPart = remaining - newPart;
+        dc.setPenWidth(5);
+        var f0 = 0.0;
+        var parts = [done, newPart, revPart];
+        var colors = [ACCENT, PAPER, MUTED];
+        for (var i = 0; i < 3; i++) {
+            var n = parts[i] as Number;
+            if (n <= 0) {
+                continue;
+            }
+            var f1 = f0 + n.toFloat() / total;
+            _arc(dc, cx, cy, r, f0, f1, colors[i] as Number);
+            f0 = f1;
+        }
+        dc.setPenWidth(1);
+    }
+
+    // Clockwise arc between two fractions of the circle (0 = 12 o'clock),
+    // with a ~1.5 degree gap at each end so neighbours stay distinguishable.
+    function _arc(dc as Dc, cx as Number, cy as Number, r as Number,
+            f0 as Float, f1 as Float, color as Number) as Void {
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        if (f1 - f0 >= 0.999) {
+            dc.drawCircle(cx, cy, r);
+            return;
+        }
+        var a0 = 360.0 * f0 + 1.5;
+        var a1 = 360.0 * f1 - 1.5;
+        if (a1 <= a0) {
+            return;
+        }
+        var s = 90 - a0.toNumber();
+        var e = 90 - a1.toNumber();
+        while (s < 0) { s += 360; }
+        while (e < 0) { e += 360; }
+        dc.drawArc(cx, cy, r, Graphics.ARC_CLOCKWISE, s, e);
+    }
+
     // Usable text width on a round screen: chord length at the vertical
     // center of a text line (yCenter), keeping `margin` px off the bezel.
     // Returns 0 when yCenter falls outside the circle.

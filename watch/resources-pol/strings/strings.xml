@@ -3,7 +3,7 @@
     <string id="HomeDeckOne">talia</string>
     <string id="HomeDecksFew">talie</string>
     <string id="HomeDecksMany">talii</string>
-    <string id="HomeLastSync">Ostatni sync:</string>
+    <string id="HomeSynced">Sync</string>
     <string id="HomeDue">do zrobienia</string>
     <string id="HomeNew">nowych</string>
     <string id="HomeRev">powt.</string>

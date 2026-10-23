@@ -7,7 +7,7 @@
     <string id="HomeDeckOne">deck</string>
     <string id="HomeDecksFew">decks</string>
     <string id="HomeDecksMany">decks</string>
-    <string id="HomeLastSync">Last sync:</string>
+    <string id="HomeSynced">Synced</string>
     <string id="HomeDue">due</string>
     <string id="HomeNew">new</string>
     <string id="HomeRev">rev</string>
