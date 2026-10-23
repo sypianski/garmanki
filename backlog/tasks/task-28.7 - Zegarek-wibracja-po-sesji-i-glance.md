@@ -1,9 +1,11 @@
 ---
 id: TASK-28.7
 title: 'Zegarek: wibracja po sesji i glance'
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-23 18:00'
+updated_date: '2026-10-23 18:15'
 labels:
   - watch
   - ux
@@ -24,3 +26,9 @@ Wibracja po ostatniej karcie (sprawdzić w dokumentacji Toybox.Attention, czy po
 - [ ] #2 Glance zaimplementowany albo udokumentowane, dlaczego niemożliwy na minApiLevel 3.4.0
 - [ ] #3 Build monkeyc przechodzi dla fr965, fenix7 i venu3
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Wibracja: ReviewView._buzz() — jeden impuls 250 ms przy ocenie ostatniej karty (finished=true), z osłoną 'Attention has :vibrate' i respektowaniem DeviceSettings.vibrateOn. SDK nie wymaga uprawnienia w manifeście (doc Toybox.Attention). Build fr965/fenix7/venu3 OK; nie sprawdzone na zegarku. Glance: NIE wdrożony — AppBase.getGlanceView() jest od API 4.0.0, a manifest ma minApiLevel 3.4.0; wymaga decyzji usera (podnieść minApiLevel / ograniczyć do wspieranych urządzeń / zrezygnować).
+<!-- SECTION:NOTES:END -->

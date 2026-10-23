@@ -5,6 +5,7 @@ import Toybox.System;
 import Toybox.Time;
 import Toybox.Application.Storage;
 import Toybox.Math;
+import Toybox.Attention;
 
 // One review session over a snapshot of a deck's cards.
 //
@@ -501,10 +502,22 @@ class ReviewView extends WatchUi.View {
         Link.get().flush();
         var minutes = (System.getTimer() - _startMs) / 60000;
         if (_done > 0) {
+            if (finished) {
+                _buzz();
+            }
             WatchUi.switchToView(new SummaryView(_done, minutes, _counts),
                 new SummaryDelegate(), WatchUi.SLIDE_LEFT);
         } else {
             WatchUi.popView(WatchUi.SLIDE_RIGHT);
+        }
+    }
+
+    // One short pulse when the last card is graded, so the user can look
+    // away during a session. Honors the watch's vibration setting; devices
+    // without a motor lack Attention :vibrate.
+    private function _buzz() as Void {
+        if (Attention has :vibrate && System.getDeviceSettings().vibrateOn) {
+            Attention.vibrate([new Attention.VibeProfile(60, 250)]);
         }
     }
 }
