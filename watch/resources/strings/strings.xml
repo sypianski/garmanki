@@ -3,7 +3,11 @@
     <!-- Keep in sync with the version entered in the Connect IQ Store form. -->
     <string id="AppVersion">1.2.3</string>
 
-    <string id="HomeDecks">Decks</string>
+    <!-- Plural forms: one / few (2-4, not 12-14) / many. See HomeView._decksWord. -->
+    <string id="HomeDeckOne">deck</string>
+    <string id="HomeDecksFew">decks</string>
+    <string id="HomeDecksMany">decks</string>
+    <string id="HomeLastSync">Last sync:</string>
     <string id="HomeDue">due</string>
     <string id="HomeNew">new</string>
     <string id="HomeRev">rev</string>
@@ -30,6 +34,7 @@
     <string id="Guide4">Hold UP for suspend, bury, flag, delete. BACK ends the session.</string>
     <string id="GuideDone">START to finish</string>
     <string id="HomeStreak">day streak</string>
+    <string id="HomeStreakOne">day streak</string>
 
     <string id="EaseAgain">Again</string>
     <string id="EaseHard">Hard</string>

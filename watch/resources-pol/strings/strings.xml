@@ -1,0 +1,60 @@
+<strings>
+    <!-- Polish. AppName and AppVersion are deliberately not overridden. -->
+    <string id="HomeDeckOne">talia</string>
+    <string id="HomeDecksFew">talie</string>
+    <string id="HomeDecksMany">talii</string>
+    <string id="HomeLastSync">Ostatni sync:</string>
+    <string id="HomeDue">do zrobienia</string>
+    <string id="HomeNew">nowych</string>
+    <string id="HomeRev">powt.</string>
+    <!-- Spaced uppercase caption: ASCII only (toUpper is not reliable for diacritics). -->
+    <string id="HomeAllDone">Dzisiaj gotowe</string>
+    <string id="HomeNoData">Brak danych. Otwórz Garmanki w telefonie</string>
+
+    <string id="MenuDecksTitle">Talie</string>
+    <string id="DeckEmpty">Na dziś koniec</string>
+
+    <string id="WordAgain">znów</string>
+    <string id="WordHard">trudne</string>
+    <string id="WordGood">dobre</string>
+    <string id="WordEasy">łatwe</string>
+
+    <string id="GuideTitle">Przewodnik</string>
+    <string id="GuideT1">Pokaż</string>
+    <string id="GuideT2">Oceń</string>
+    <string id="GuideT3">Dotyk</string>
+    <string id="GuideT4">Więcej</string>
+    <string id="Guide1">Dowolny przycisk albo dotknięcie odsłania odpowiedź</string>
+    <string id="Guide2">Przyciski oceniają kartę</string>
+    <string id="Guide4">Przytrzymaj UP: zawieś, odłóż, oflaguj, usuń. BACK kończy sesję.</string>
+    <string id="GuideDone">START, by zakończyć</string>
+    <string id="HomeStreak">dni z rzędu</string>
+    <string id="HomeStreakOne">dzień z rzędu</string>
+
+    <string id="EaseAgain">Znów</string>
+    <string id="EaseHard">Trudne</string>
+    <string id="EaseGood">Dobre</string>
+    <string id="EaseEasy">Łatwe</string>
+    <string id="ActSuspend">Zawieś</string>
+    <string id="ActBury">Odłóż</string>
+    <string id="ActFlag">Oflaguj</string>
+    <string id="ActDelete">Usuń</string>
+    <string id="Flagged">Oflagowano</string>
+
+    <!-- Spaced uppercase caption: ASCII only. -->
+    <string id="SummaryTitle">Koniec sesji</string>
+    <string id="SummaryCards">kart</string>
+    <string id="SummaryQueued">w kolejce do sync</string>
+
+    <string id="MenuSyncTitle">Synchronizuj</string>
+    <string id="SyncSent">Prośba o sync wysłana</string>
+    <string id="SyncNoPhone">Aby zsynchronizować, otwórz Garmanki w telefonie</string>
+    <string id="SyncApplied">Talia zaktualizowana</string>
+    <string id="SyncAnswersOk">Odpowiedzi dostarczone</string>
+    <string id="SyncNever">Jeszcze nie zsynchronizowano</string>
+    <string id="SyncConnectPhone">Połącz z telefonem</string>
+    <string id="SyncUnsynced">niewysłanych</string>
+    <string id="SyncOpenPhone">otwórz telefon</string>
+    <string id="SyncPhoneOff">Telefon poza zasięgiem</string>
+    <string id="SyncVersionMismatch">Zaktualizuj Garmanki na obu urządzeniach</string>
+</strings>

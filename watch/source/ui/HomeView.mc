@@ -132,7 +132,8 @@ class HomeView extends WatchUi.View {
             var fh = dc.getFontHeight(Graphics.FONT_XTINY);
             dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, syncY, Graphics.FONT_XTINY,
-                "Last sync:", Graphics.TEXT_JUSTIFY_CENTER);
+                WatchUi.loadResource(Rez.Strings.HomeLastSync) as String,
+                Graphics.TEXT_JUSTIFY_CENTER);
             dc.drawText(cx, syncY + fh, Graphics.FONT_XTINY,
                 _syncLine(syncT as Number), Graphics.TEXT_JUSTIFY_CENTER);
         }
@@ -191,13 +192,13 @@ class HomeView extends WatchUi.View {
 
     private function _drawHabit(dc as Dc, cx as Number, lineY as Number,
             nDecks as Number, stats as Array) as Void {
-        var base = nDecks.toString() + " "
-            + (WatchUi.loadResource(Rez.Strings.HomeDecks) as String).toLower();
+        var base = nDecks.toString() + " " + _decksWord(nDecks);
         var streak = stats[1] instanceof Number ? stats[1] : 0;
         var full = base;
         if (streak > 0) {
             full += " · " + streak.toString() + " "
-                + (WatchUi.loadResource(Rez.Strings.HomeStreak) as String);
+                + (WatchUi.loadResource(streak == 1
+                    ? Rez.Strings.HomeStreakOne : Rez.Strings.HomeStreak) as String);
         }
         var fontH = dc.getFontHeight(Graphics.FONT_XTINY);
         var maxW = Theme.chordWidth(dc, lineY + fontH / 2, 8);
@@ -207,17 +208,30 @@ class HomeView extends WatchUi.View {
             Graphics.TEXT_JUSTIFY_CENTER);
     }
 
+    // Plural form per count: one / few (2-4, not 12-14) / many. English maps
+    // few and many to the same string; Polish (and other Slavic languages)
+    // differ, so the rule lives in code and the words in the resources.
+    private function _decksWord(n as Number) as String {
+        var id = Rez.Strings.HomeDecksMany;
+        var m10 = n % 10;
+        var m100 = n % 100;
+        if (n == 1) {
+            id = Rez.Strings.HomeDeckOne;
+        } else if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) {
+            id = Rez.Strings.HomeDecksFew;
+        }
+        return WatchUi.loadResource(id) as String;
+    }
+
     private function _syncLine(syncT as Number) as String {
         // Always shape: "D MMM HH:MM" (e.g. "24 Jul 14:32"). The user's mental
         // model of "how stale is my state" needs a concrete date, not a
         // relative phrase like "just now" or "Yesterday" — those hide the
-        // one number that matters when something is actually wrong.
-        var si = Gregorian.info(new Time.Moment(syncT), Time.FORMAT_SHORT);
+        // one number that matters when something is actually wrong. The month
+        // abbreviation comes from FORMAT_MEDIUM, so it follows the watch language.
+        var si = Gregorian.info(new Time.Moment(syncT), Time.FORMAT_MEDIUM);
         var timeStr = si.hour.format("%02d") + ":" + si.min.format("%02d");
-        var mon = ["Jan","Feb","Mar","Apr","May","Jun",
-                   "Jul","Aug","Sep","Oct","Nov","Dec"];
-        return si.day.toString() + " " + mon[(si.month as Number) - 1]
-            + " " + timeStr;
+        return si.day.toString() + " " + si.month + " " + timeStr;
     }
 }
 
