@@ -51,6 +51,7 @@ class ReviewView extends WatchUi.View {
     private var _deckName as String;
     private var _showAnswer as Boolean = false;
     private var _done as Number = 0;
+    private var _counts as Array = [0, 0, 0, 0]; // grades given this sitting: Again, Hard, Good, Easy
     private var _startMs as Number;
     private var _cardStartMs as Number;
 
@@ -416,6 +417,7 @@ class ReviewView extends WatchUi.View {
         }
         CardStore.queueRow(["a", card[0], card[1], card[2], ease, timeMs, Time.now().value()]);
         _done++;
+        _counts[ease - 1] = (_counts[ease - 1] as Number) + 1;
         // "Again" → back into the learning queue with a due timestamp derived
         // from Anki's own Again interval (nt1). The step grows with each miss
         // and STEP_CAP bounds re-shows so the session always terminates. Any
@@ -455,7 +457,7 @@ class ReviewView extends WatchUi.View {
         Link.get().flush();
         var minutes = (System.getTimer() - _startMs) / 60000;
         if (_done > 0) {
-            WatchUi.switchToView(new SummaryView(_done, minutes),
+            WatchUi.switchToView(new SummaryView(_done, minutes, _counts),
                 new SummaryDelegate(), WatchUi.SLIDE_LEFT);
         } else {
             WatchUi.popView(WatchUi.SLIDE_RIGHT);
