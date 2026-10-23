@@ -114,6 +114,7 @@ class SyncEngine(
                     "am" to s.actionMap,
                     "ca" to s.cardActions.toList(),
                     "gr" to s.guideReset,
+                    "tm" to s.tickMode,
                 ),
             )
             val result = ciq.push(chunks, rev)

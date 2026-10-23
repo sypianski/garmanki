@@ -8,6 +8,7 @@ import app.sypianski.garmanki.ciq.CiqLink
 import app.sypianski.garmanki.ciq.PushStatus
 import app.sypianski.garmanki.ciq.WatchMessage
 import app.sypianski.garmanki.data.Settings
+import app.sypianski.garmanki.data.SettingsStore
 import app.sypianski.garmanki.data.SyncPrefs
 import app.sypianski.garmanki.sync.DELETE_TAG
 import app.sypianski.garmanki.sync.FLAG_TAG
@@ -188,5 +189,21 @@ class SyncEngineTest {
         val firstChunk = ciq.pushes[0].first[0]
         val row = (firstChunk["cards"] as List<*>)[0] as List<*>
         assertEquals("front", row[4])
+    }
+
+    @Test
+    fun `cfg carries the tick mode, default interval, and follows the setting`() = runTest {
+        val ciq = FakeCiq()
+        val prefs = FakePrefs()
+        val engine = SyncEngine(FakeAnki(), ciq, prefs, this, clock = { 1_000_000L })
+
+        assertTrue(engine.pushState())
+        val first = ciq.pushes[0].first[0]["cfg"] as Map<*, *>
+        assertEquals(SettingsStore.TICK_INTERVAL, first["tm"])
+
+        prefs.settings = prefs.settings.copy(tickMode = SettingsStore.TICK_WORD)
+        assertTrue(engine.pushState())
+        val second = ciq.pushes[1].first[0]["cfg"] as Map<*, *>
+        assertEquals(SettingsStore.TICK_WORD, second["tm"])
     }
 }

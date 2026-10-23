@@ -1,6 +1,7 @@
 import Toybox.Lang;
 import Toybox.Graphics;
 import Toybox.Math;
+import Toybox.WatchUi;
 
 // Visual identity — "ink & paper on OLED".
 //
@@ -54,6 +55,30 @@ module Theme {
         dc.setPenWidth(px(dc, 7));
         dc.drawArc(cx, cy, r, Graphics.ARC_COUNTER_CLOCKWISE, angle - 7, angle + 7);
         dc.setPenWidth(1);
+    }
+
+    // Short label beside a bezel tick, just inside it, running inward from the
+    // bezel side so it stays inside the chord (same geometry as the guide).
+    function tickLabel(dc as Dc, angle as Number, text as String, color as Number,
+            font as Graphics.FontType) as Void {
+        var cx = dc.getWidth() / 2;
+        var cy = dc.getHeight() / 2;
+        var fh = dc.getFontHeight(font);
+        var lr = cx - px(dc, 45);
+        var rad = angle * Math.PI / 180.0;
+        var lx = cx + (lr * Math.cos(rad)).toNumber();
+        var ly = cy - (lr * Math.sin(rad)).toNumber() - fh / 2;
+        var just = Math.cos(rad) < 0
+            ? Graphics.TEXT_JUSTIFY_LEFT : Graphics.TEXT_JUSTIFY_RIGHT;
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(lx, ly, font, text, just);
+    }
+
+    // Lowercase grade word (1=Again … 4=Easy) in the watch language.
+    function easeWord(ease as Number) as String {
+        var ids = [Rez.Strings.WordAgain, Rez.Strings.WordHard,
+                   Rez.Strings.WordGood, Rez.Strings.WordEasy];
+        return WatchUi.loadResource(ids[ease - 1]) as String;
     }
 
     // Progress ring: faint full circle + accent sweep clockwise from top.

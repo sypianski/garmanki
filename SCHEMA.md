@@ -97,6 +97,7 @@ fresh state rev.
 | `actionMap` | Dictionary — event→ease overrides, §8 `am` stored verbatim |
 | `cardActions` | Array — enabled card actions, §8 `ca` stored verbatim |
 | `guideReset` | Int — last §8 `gr` value seen |
+| `tickMode` | Int — §8 `tm` (0 color, 1 +interval, 2 +word), absent = 1 |
 | `onboardingSeen` | Bool — first-run guide already shown (GAR-03) |
 
 Caps: 8 decks × 100 cards default (companion setting), hard cap 400
@@ -137,7 +138,7 @@ If `front` ends up empty → skip the card and count it as `skipped`
 
 Rides on chunk `seq:1` of a state push as `cfg`:
 
-`cfg: {am: {<event>: <ease>…}, ca: [<action>…], gr: <Int>}`
+`cfg: {am: {<event>: <ease>…}, ca: [<action>…], gr: <Int>, tm: <Int>}`
 
 - `am` — action map (GAR-04/05). Keys: `"up"`, `"down"`, `"start"`,
   `"tap"`, `"swipeR"`, `"swipeL"`, `"swipeU"`, `"swipeD"`. Values:
@@ -152,7 +153,13 @@ Rides on chunk `seq:1` of a state push as `cfg`:
   (guide replays on next launch). The first value ever seen is stored
   without replaying the guide.
 
-All of `am`/`ca`/`gr` are individually optional. A watch build that
+- `tm` — bezel marks on the watch answer screen: `0` color only, `1`
+  color plus the card's next-interval label (`nt1..nt4`, §2) beside each
+  grade tick, `2` color plus the grade word. Omitted = the watch keeps
+  its stored value, initially `1`. Additive, so `pv` stays `1`. A watch
+  that predates this key ignores it and keeps color-only ticks.
+
+All of `am`/`ca`/`gr`/`tm` are individually optional. A watch build that
 predates this section ignores `cfg` entirely; the companion always
 sends the full current config (small, ~150 chars). The companion MUST
 keep at least one event mapped to Again and one to Good (validated in

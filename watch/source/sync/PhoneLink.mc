@@ -233,6 +233,10 @@ class PhoneLink {
         if (ca instanceof Array) {
             Storage.setValue("cardActions", ca);
         }
+        var tm = cfg["tm"];
+        if (tm instanceof Number && tm >= 0 && tm <= 2) {
+            Storage.setValue("tickMode", tm);
+        }
         var gr = cfg["gr"];
         if (gr instanceof Number) {
             var seen = Storage.getValue("guideReset");

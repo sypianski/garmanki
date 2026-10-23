@@ -275,14 +275,37 @@ class ReviewView extends WatchUi.View {
             var ap = _splitFields(card[5] as String);
             var aExtra = ap[1] as String;
             var aHasExtra = aExtra.length() > 0;
+            var aTop = h * 20 / 100;
             var aMainH = aHasExtra ? h * 40 / 100 : h * 58 / 100;
+            var xTop = h * 64 / 100;
+            var xH = h * 15 / 100;
+            var tickMode = _tickMode();
+            var labelFont = tickMode == 2 ? Graphics.FONT_TINY : Graphics.FONT_XTINY;
+            if (tickMode != 0) {
+                // Tick labels sit at the bezel rows of the buttons (30/150 deg
+                // on top, 210 deg below), so the answer lives in the band
+                // between them and the extra field below the lower row.
+                var lfh = dc.getFontHeight(labelFont);
+                var lr = cx - Theme.px(dc, 45);
+                var pad = Theme.px(dc, 3);
+                aTop = h / 2 - lr / 2 + lfh / 2 + pad;
+                var aBottom = h * 80 / 100;
+                if (DeviceProfile.HAS_UPDOWN_BUTTONS) {
+                    aBottom = h / 2 + lr / 2 - lfh / 2 - pad;
+                    xTop = h / 2 + lr / 2 + lfh / 2 + pad;
+                    xH = Theme.px(dc, 46);
+                } else if (aHasExtra) {
+                    aBottom = h * 62 / 100;
+                }
+                aMainH = aBottom - aTop;
+            }
             var a = new WatchUi.TextArea({
                 :text => ap[0] as String,
                 :color => Theme.PAPER,
                 :font => [Graphics.FONT_LARGE, Graphics.FONT_MEDIUM,
                           Graphics.FONT_SMALL, Graphics.FONT_TINY, Graphics.FONT_XTINY],
                 :locX => w / 10,
-                :locY => h * 20 / 100,
+                :locY => aTop,
                 :width => w * 8 / 10,
                 :height => aMainH,
                 :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
@@ -294,9 +317,9 @@ class ReviewView extends WatchUi.View {
                     :color => Theme.MUTED,
                     :font => [Graphics.FONT_TINY, Graphics.FONT_XTINY],
                     :locX => w / 8,
-                    :locY => h * 64 / 100,
+                    :locY => xTop,
                     :width => w * 3 / 4,
-                    :height => h * 15 / 100,
+                    :height => xH,
                     :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
                 });
                 ax.draw(dc);
@@ -312,6 +335,12 @@ class ReviewView extends WatchUi.View {
                 var ease = ActionMap.easeFor(events[k]);
                 if (ease != null) {
                     Theme.tick(dc, angles[k], Theme.easeColor(ease));
+                    var label = tickMode == 1 ? _intervalFor(card, ease)
+                        : (tickMode == 2 ? Theme.easeWord(ease) : "");
+                    if (label.length() > 0) {
+                        Theme.tickLabel(dc, angles[k], label,
+                            Theme.easeColor(ease), labelFont);
+                    }
                 }
             }
         }
@@ -337,6 +366,21 @@ class ReviewView extends WatchUi.View {
             [(ex - dy * half).toNumber(), (ey + dx * half).toNumber()],
             [(ex + dy * half).toNumber(), (ey - dx * half).toNumber()]
         ]);
+    }
+
+    // Bezel-mark mode set from the companion (SCHEMA.md §8 `tm`): 0 color only,
+    // 1 + next interval (default), 2 + grade word.
+    private function _tickMode() as Number {
+        var tm = Storage.getValue("tickMode");
+        return (tm instanceof Number && tm >= 0 && tm <= 2) ? tm : 1;
+    }
+
+    // Next-interval label AnkiDroid computed for this ease ("<1 min", "4 d"),
+    // or "" when the card carries none.
+    private function _intervalFor(card as Array, ease as Number) as String {
+        var nt = card[6] as Array;
+        var v = nt.size() >= ease ? nt[ease - 1] : "";
+        return v instanceof String ? v : "";
     }
 
     function isRevealed() as Boolean {

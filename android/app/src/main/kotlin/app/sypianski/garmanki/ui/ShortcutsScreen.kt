@@ -1,6 +1,7 @@
 package app.sypianski.garmanki.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.sypianski.garmanki.App
@@ -59,6 +62,12 @@ fun ShortcutsScreen(app: App, onBack: () -> Unit) {
                         onSaveMapping = { m ->
                             app.appScope.launch {
                                 app.settings.setActionMap(m)
+                                if (ankiPermitted) app.engine.pushState()
+                            }
+                        },
+                        onTickMode = { m ->
+                            app.appScope.launch {
+                                app.settings.setTickMode(m)
                                 if (ankiPermitted) app.engine.pushState()
                             }
                         },
@@ -109,6 +118,7 @@ private fun easeLabel(ease: Int): String = when (ease) {
 private fun WatchControlsCard(
     settings: Settings,
     onSaveMapping: (Map<String, Int>) -> Unit,
+    onTickMode: (Int) -> Unit,
     onCardActions: (Set<String>) -> Unit,
     onGuideAgain: () -> Unit,
 ) {
@@ -146,6 +156,36 @@ private fun WatchControlsCard(
                 modifier = Modifier.weight(1f),
             ) {
                 Text(stringResource(R.string.controls_reset))
+            }
+        }
+        HorizontalDivider()
+        Text(
+            stringResource(R.string.controls_ticks_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        listOf(
+            SettingsStore.TICK_COLOR to R.string.controls_ticks_color,
+            SettingsStore.TICK_INTERVAL to R.string.controls_ticks_interval,
+            SettingsStore.TICK_WORD to R.string.controls_ticks_word,
+        ).forEach { (mode, label) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .selectable(
+                        selected = settings.tickMode == mode,
+                        onClick = { onTickMode(mode) },
+                        role = Role.RadioButton,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = settings.tickMode == mode, onClick = null)
+                Text(
+                    stringResource(label),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 12.dp),
+                )
             }
         }
         HorizontalDivider()

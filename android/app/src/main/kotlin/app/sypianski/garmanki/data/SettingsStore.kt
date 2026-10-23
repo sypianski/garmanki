@@ -28,6 +28,8 @@ data class Settings(
     val actionMap: Map<String, Int> = SettingsStore.DEFAULT_ACTION_MAP,
     val cardActions: Set<String> = SettingsStore.ALL_CARD_ACTIONS,
     val guideReset: Int = 0,
+    /** Bezel marks on the watch answer screen, SCHEMA.md §8 `tm`: SettingsStore.TICK_*. */
+    val tickMode: Int = SettingsStore.DEFAULT_TICK_MODE,
     /** App appearance, SettingsStore.THEME_*: "system" (dynamic/slate) or "eink". */
     val themeMode: String = SettingsStore.THEME_SYSTEM,
 )
@@ -57,6 +59,7 @@ class SettingsStore(private val context: Context) : SyncPrefs {
         val actionMap = stringPreferencesKey("actionMap")
         val cardActions = stringSetPreferencesKey("cardActions")
         val guideReset = intPreferencesKey("guideReset")
+        val tickMode = intPreferencesKey("tickMode")
         val themeMode = stringPreferencesKey("themeMode")
     }
 
@@ -76,6 +79,7 @@ class SettingsStore(private val context: Context) : SyncPrefs {
             actionMap = decodeActionMap(p[Keys.actionMap]),
             cardActions = p[Keys.cardActions] ?: ALL_CARD_ACTIONS,
             guideReset = p[Keys.guideReset] ?: 0,
+            tickMode = p[Keys.tickMode] ?: DEFAULT_TICK_MODE,
             themeMode = p[Keys.themeMode] ?: THEME_SYSTEM,
         )
     }
@@ -131,6 +135,10 @@ class SettingsStore(private val context: Context) : SyncPrefs {
         }
     }
 
+    suspend fun setTickMode(mode: Int) {
+        context.dataStore.edit { it[Keys.tickMode] = mode.coerceIn(TICK_COLOR, TICK_WORD) }
+    }
+
     suspend fun setThemeMode(mode: String) {
         val clean = if (mode == THEME_EINK) THEME_EINK else THEME_SYSTEM
         context.dataStore.edit { it[Keys.themeMode] = clean }
@@ -156,6 +164,12 @@ class SettingsStore(private val context: Context) : SyncPrefs {
 
     companion object {
         const val DEFAULT_CARD_LIMIT = 100
+
+        /** Bezel marks on the watch answer screen (SCHEMA.md §8 `tm`). */
+        const val TICK_COLOR = 0
+        const val TICK_INTERVAL = 1
+        const val TICK_WORD = 2
+        const val DEFAULT_TICK_MODE = TICK_INTERVAL
 
         /** Appearance modes (Settings.themeMode). */
         const val THEME_SYSTEM = "system"

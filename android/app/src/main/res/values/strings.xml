@@ -45,6 +45,10 @@
     <string name="controls_need_grades">Mapping must include both Again and Good</string>
     <string name="controls_actions_hint">Card actions available in the watch menu:</string>
     <string name="controls_guide">Show the guide again</string>
+    <string name="controls_ticks_hint">Marks at the watch buttons on the answer screen:</string>
+    <string name="controls_ticks_color">Color only</string>
+    <string name="controls_ticks_interval">Color and next interval</string>
+    <string name="controls_ticks_word">Color and grade name</string>
 
     <string name="theme_section">Appearance</string>
     <string name="theme_dynamic">Dynamic</string>
