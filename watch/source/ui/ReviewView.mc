@@ -27,9 +27,9 @@ import Toybox.Math;
 // most STEP_CAP times). This changes only *presentation order* — the answer
 // queue `q` still gets one row per keypress with the real (ease, timeMs, epoch).
 //
-// Design ("ink & paper"): 120° progress dot-arc along the top bezel, question in
-// paper-white; on reveal the question dims to warm gray and the answer takes
-// the ink — hierarchy through light, not chrome. The only standing hint
+// Design ("ink & paper"): thin progress ring around the screen, question in
+// paper-white; on reveal the question gives way to the answer alone — the
+// answer takes the whole middle band, hierarchy through light, not chrome. The only standing hint
 // system is the color ticks on the bezel at the physical buttons, colored
 // per mapped ease (Theme.easeColor); the onboarding guide (GAR-03) teaches
 // the rest.
@@ -220,30 +220,22 @@ class ReviewView extends WatchUi.View {
         var remaining = (_new.size() - _ni) + _learn.size();
         var known = _done + 1 + remaining;
 
-        // Session progress: dots arc along the top bezel (150°→30°, 16 dots).
-        // Inset (15 px on 454) from edge so dots clear the UP-button area.
-        var r = cx - Theme.px(dc, 15);
-        var cy = h / 2;
-        var doneDots = known > 0
-            ? (_done * 15 / known)  // 0..15 range for 16 dots (indices 0..15)
-            : -1;
-        for (var di = 0; di < 16; di++) {
-            var angleDeg = 150.0 - (120.0 * di / 15.0);
-            var angleRad = angleDeg * Math.PI / 180.0;
-            var dx = (cx + r * Math.cos(angleRad)).toNumber();
-            var dy = (cy - r * Math.sin(angleRad)).toNumber();
-            if (di <= doneDots) {
-                dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-            } else {
-                dc.setColor(Theme.FAINT, Graphics.COLOR_TRANSPARENT);
-            }
-            dc.fillCircle(dx, dy, Theme.px(dc, 1));
-        }
+        // Session progress: the same thin ring as on the home screen, swept
+        // clockwise from 12 o'clock. It can step back after an Again, since the
+        // denominator grows with the queue.
+        Theme.ring(dc, cx - 12, known > 0 ? _done.toFloat() / known : 0.0);
 
+        var counter = (_done + 1).toString() + "/" + known.toString();
         dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 6 / 100, Graphics.FONT_XTINY,
-            (_done + 1).toString() + "/" + known.toString(),
+        dc.drawText(cx, h * 6 / 100, Graphics.FONT_XTINY, counter,
             Graphics.TEXT_JUSTIFY_CENTER);
+        if (_curStep > 0 && !_showAnswer) {
+            // This card was failed earlier in the sitting and came back.
+            _drawRepeatMark(dc,
+                cx + dc.getTextWidthInPixels(counter, Graphics.FONT_XTINY) / 2
+                    + Theme.px(dc, 16),
+                h * 6 / 100 + dc.getFontHeight(Graphics.FONT_XTINY) / 2);
+        }
 
         if (!_showAnswer) {
             var qp = _splitFields(card[4] as String);
@@ -277,33 +269,19 @@ class ReviewView extends WatchUi.View {
             }
             Theme.tick(dc, Theme.ANG_START, Theme.ACCENT);
         } else {
-            // Question recedes, answer takes the ink.
-            var qp = _splitFields(card[4] as String);
-            var q = new WatchUi.TextArea({
-                :text => qp[0] as String,
-                :color => Theme.MUTED,
-                :font => [Graphics.FONT_TINY, Graphics.FONT_XTINY],
-                :locX => w / 8,
-                :locY => h * 14 / 100,
-                :width => w * 3 / 4,
-                :height => h * 22 / 100,
-                :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
-            });
-            q.draw(dc);
-            dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
-            dc.fillRectangle(cx - Theme.px(dc, 22), h * 39 / 100,
-                Theme.px(dc, 44), Theme.px(dc, 3));
+            // Answer only: the question was just on screen, so the answer gets
+            // the whole middle band (TASK-28.4).
             var ap = _splitFields(card[5] as String);
             var aExtra = ap[1] as String;
             var aHasExtra = aExtra.length() > 0;
-            var aMainH = aHasExtra ? h * 28 / 100 : h * 42 / 100;
+            var aMainH = aHasExtra ? h * 40 / 100 : h * 58 / 100;
             var a = new WatchUi.TextArea({
                 :text => ap[0] as String,
                 :color => Theme.PAPER,
                 :font => [Graphics.FONT_LARGE, Graphics.FONT_MEDIUM,
                           Graphics.FONT_SMALL, Graphics.FONT_TINY, Graphics.FONT_XTINY],
                 :locX => w / 10,
-                :locY => h * 43 / 100,
+                :locY => h * 20 / 100,
                 :width => w * 8 / 10,
                 :height => aMainH,
                 :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
@@ -315,9 +293,9 @@ class ReviewView extends WatchUi.View {
                     :color => Theme.MUTED,
                     :font => [Graphics.FONT_TINY, Graphics.FONT_XTINY],
                     :locX => w / 8,
-                    :locY => h * 72 / 100,
+                    :locY => h * 64 / 100,
                     :width => w * 3 / 4,
-                    :height => h * 13 / 100,
+                    :height => h * 15 / 100,
                     :justification => Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
                 });
                 ax.draw(dc);
@@ -336,6 +314,28 @@ class ReviewView extends WatchUi.View {
                 }
             }
         }
+    }
+
+    // Small ACCENT "again" arrow (270 degrees of arc + arrowhead) centred at
+    // (x, y). Drawn, not a glyph: built-in fonts don't guarantee ↻.
+    private function _drawRepeatMark(dc as Dc, x as Number, y as Number) as Void {
+        var r = Theme.px(dc, 7);
+        dc.setColor(Theme.ACCENT, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(2);
+        dc.drawArc(x, y, r, Graphics.ARC_COUNTER_CLOCKWISE, 70, 340);
+        dc.setPenWidth(1);
+        // Arrowhead at the arc's end (340 degrees), pointing along the travel.
+        var ex = x + r * Math.cos(340 * Math.PI / 180.0);
+        var ey = y - r * Math.sin(340 * Math.PI / 180.0);
+        var dx = 0.342;
+        var dy = -0.940;
+        var len = Theme.px(dc, 6).toFloat();
+        var half = Theme.px(dc, 4).toFloat();
+        dc.fillPolygon([
+            [(ex + dx * len).toNumber(), (ey + dy * len).toNumber()],
+            [(ex - dy * half).toNumber(), (ey + dx * half).toNumber()],
+            [(ex + dy * half).toNumber(), (ey - dx * half).toNumber()]
+        ]);
     }
 
     function isRevealed() as Boolean {
