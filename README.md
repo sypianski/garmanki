@@ -53,8 +53,12 @@ Plain fēnix 6 / 6S (128 KB app RAM) are **not** supported yet.
 
 - Text only: no images or audio on the watch; cloze deletions show as
   `[...]`.
-- Latin script only (including Polish) — Greek, Arabic and CJK are
-  planned.
+- Latin script only (including Polish). Greek, Arabic (including
+  harakat and right-to-left text) and CJK are **not** supported: the
+  built-in Garmin fonts cannot draw them. There is no decision or
+  timeline; Arabic feasibility is being researched.
+- Needs an Android phone with the Garmanki companion and AnkiDroid:
+  without them the watch has no cards to show (it displays "No data").
 - Android only: there is no iOS companion. Its feasibility is being
   researched; there is no decision or timeline.
 
