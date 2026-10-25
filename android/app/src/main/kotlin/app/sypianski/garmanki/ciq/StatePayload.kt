@@ -33,8 +33,8 @@ object StatePayload {
      */
     const val PROTOCOL_VERSION = 1
 
-    /** Keep each BLE message well under the ~16 KB practical payload limit. */
-    const val MAX_CHUNK_CHARS = 10_000
+    /** Keep each BLE message well under the ~16 KB practical payload limit (UTF-8 bytes, SCHEMA.md §2). */
+    const val MAX_CHUNK_BYTES = 10_000
     const val MAX_CARDS_PER_CHUNK = 60
 
     fun buildChunks(
@@ -58,10 +58,10 @@ object StatePayload {
         var chars = decksEstimate(decks)
         for (c in cards) {
             val row = listOf(c.cid, c.nid, c.ord, c.deckIdx, c.front, c.back, padTo4(c.nextTimes))
-            val est = 40 + c.cid.length + c.front.length + c.back.length +
-                c.nextTimes.sumOf { it.length }
+            val est = 40 + utf8(c.cid) + utf8(c.front) + utf8(c.back) +
+                c.nextTimes.sumOf { utf8(it) }
             if (current.isNotEmpty() &&
-                (current.size >= MAX_CARDS_PER_CHUNK || chars + est > MAX_CHUNK_CHARS)
+                (current.size >= MAX_CARDS_PER_CHUNK || chars + est > MAX_CHUNK_BYTES)
             ) {
                 groups.add(current)
                 current = mutableListOf()
@@ -98,5 +98,7 @@ object StatePayload {
         List(4) { i -> nt.getOrElse(i) { "" } }
 
     private fun decksEstimate(decks: List<WatchDeck>): Int =
-        60 + decks.sumOf { 30 + it.name.length + it.deckId.length }
+        60 + decks.sumOf { 30 + utf8(it.name) + utf8(it.deckId) }
+
+    private fun utf8(s: String): Int = s.toByteArray(Charsets.UTF_8).size
 }

@@ -57,4 +57,40 @@ class HtmlToTextTest {
     fun `empty after cleanup yields empty string`() {
         assertEquals("", HtmlToText.clean("""<img src="a.png">[sound:a.mp3]"""))
     }
+
+    @Test
+    fun `combining marks are composed to NFC`() {
+        // a + U+0304 (macron), h + U+0323 (dot below), s + U+030C (caron)
+        assertEquals("ā ḥ š", HtmlToText.clean("a\u0304 h\u0323 s\u030C"))
+        // already-composed text is unchanged
+        assertEquals("ā ḥ š", HtmlToText.clean("ā ḥ š"))
+    }
+
+    @Test
+    fun `plain arabic without harakat is untouched`() {
+        val plain = "\u0643\u062A\u0627\u0628 \u0645\u0631\u062D\u0628\u0627"
+        assertEquals(plain, HtmlToText.clean(plain))
+    }
+
+    @Test
+    fun `arabic with harakat is shaped to presentation forms`() {
+        // كِتَابٌ -> the probe string that rendered correctly on the Forerunner 965
+        val logical = "\u0643\u0650\u062A\u064E\u0627\u0628\u064C"
+        val expected = "\uFEDB\u0650\uFE98\u064E\uFE8E\uFE8F\u064C"
+        assertEquals(expected, HtmlToText.clean(logical))
+    }
+
+    @Test
+    fun `byte cap keeps shaped text within 600 bytes and cuts on a code point`() {
+        val word = "\u0643\u0650\u062A\u064E\u0627\u0628\u064C "
+        val out = HtmlToText.clean(word.repeat(40))
+        assertTrue(out.endsWith("…"))
+        assertTrue(out.toByteArray(Charsets.UTF_8).size <= HtmlToText.MAX_BYTES)
+    }
+
+    @Test
+    fun `ascii and polish text up to 300 chars is not cut by the byte cap`() {
+        val polish = "ż".repeat(300)
+        assertEquals(polish, HtmlToText.clean(polish)) // 300 chars * 2 B = 600 B, exactly at the cap
+    }
 }

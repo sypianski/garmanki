@@ -35,7 +35,10 @@ Watch app UUID: `b1b0cef8a5b246af9c8ea2951c2d6bba`.
 - `cid`, `nid` — String (see §1); `ord` — Int (card template ordinal).
 - `deckIdx` — Int index into the `decks` array of the same state rev.
 - `front`, `back` — plain text, companion-rendered from card HTML
-  (see §6), each ≤ 300 chars (companion truncates with `…`).
+  (see §6), each ≤ 300 chars **and** ≤ 600 bytes UTF-8 (companion
+  truncates with `…`). The byte cap matters because Arabic Presentation
+  Forms (§6) cost 3 B per letter; the watch never parses or re-measures
+  the text, so its worst-case RAM per field stays at 600 B.
 - `nt1..nt4` — next-interval labels for Again/Hard/Good/Easy
   (AnkiDroid `NEXT_REVIEW_TIMES`), e.g. `"<1 min"`, `"3 d"`. Always 4
   entries; empty string when unknown.
@@ -110,6 +113,15 @@ strip `[sound:…]` and `[anki:tts]…[/anki:tts]`; drop `<img…>` and
 `<style>`/`<script>` blocks with their content; `<br>` and `<div>`/`<p>`
 (opening or closing) → `\n`; strip remaining tags; decode entities; collapse blank lines and
 trim. Cloze prompts arrive already rendered as `[...]` — kept as-is.
+Then, in order: normalize to **NFC** (the watch fonts draw precomposed
+letters such as `ā ḥ š`, combining marks are unreliable); truncate to 300
+chars; if the text contains **Arabic harakat** (U+064B–0652, U+0670)
+replace every basic Arabic letter (U+0621–064A) with its contextual
+Presentation Forms-B glyph, keeping harakat right after the base letter
+(plain Arabic without harakat is sent unchanged — the watch joins it
+itself); finally cap at 600 bytes UTF-8 at a code point boundary. Not
+shaped: lam-alef ligatures and Persian/Urdu letters outside
+U+0621–064A. Measured on a Forerunner 965 only (PC-003).
 If `front` ends up empty → skip the card and count it as `skipped`
 (surfaced in companion UI, never sent to the watch).
 

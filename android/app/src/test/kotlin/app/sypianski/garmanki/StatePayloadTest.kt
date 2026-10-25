@@ -59,18 +59,39 @@ class StatePayloadTest {
     }
 
     @Test
-    fun `chunk char budget respected for long cards`() {
+    fun `chunk byte budget respected for long cards`() {
         val chunks = StatePayload.buildChunks(
             listOf(deck(0)), List(50) { card(it, textLen = 300) }, 0, 0, rev = 1,
         )
         for (c in chunks) {
             val cards = c["cards"] as List<*>
-            val chars = cards.sumOf { row ->
-                (row as List<*>).filterIsInstance<String>().sumOf { it.length }
+            val bytes = cards.sumOf { row ->
+                (row as List<*>).filterIsInstance<String>().sumOf { it.toByteArray(Charsets.UTF_8).size }
             }
-            assertTrue("chunk too big: $chars", chars <= StatePayload.MAX_CHUNK_CHARS + 700)
+            assertTrue("chunk too big: $bytes", bytes <= StatePayload.MAX_CHUNK_BYTES + 700)
             assertTrue(cards.size <= StatePayload.MAX_CARDS_PER_CHUNK)
         }
+    }
+
+    @Test
+    fun `chunk byte budget respected for shaped arabic at the field cap`() {
+        // 3-byte presentation forms: 200 letters = 600 B per field (HtmlToText.MAX_BYTES)
+        val arabic = "\uFE91".repeat(200)
+        val cards = List(50) { i ->
+            WatchCard(
+                cid = "1600000000000:$i", nid = "1600000000000", ord = i, deckIdx = 0,
+                front = arabic, back = arabic, nextTimes = listOf("<1 min", "10 min", "3 d", "4 d"),
+            )
+        }
+        val chunks = StatePayload.buildChunks(listOf(deck(0)), cards, 0, 0, rev = 1)
+        for (c in chunks) {
+            val rows = c["cards"] as List<*>
+            val bytes = rows.sumOf { row ->
+                (row as List<*>).filterIsInstance<String>().sumOf { it.toByteArray(Charsets.UTF_8).size }
+            }
+            assertTrue("chunk too big: $bytes", bytes <= StatePayload.MAX_CHUNK_BYTES + 1300)
+        }
+        assertEquals(50, chunks.sumOf { (it["cards"] as List<*>).size })
     }
 
     @Test
