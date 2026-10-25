@@ -22,7 +22,7 @@
 > D3: B (offline z kolejką) · D4: rekomendacja (suspend/bury natywnie,
 > flaga=tag `garmanki-flag`, usuwanie=suspend+tag `garmanki-delete`) ·
 > D5: A (mapowanie klawiszy + interwały w ActionMenu) ·
-> **D6: A — tylko łacina/polski, bez greki w v1** ·
+> **D6: A — tylko łacina/polski, bez greki w v1** (zaktualizowane 2026-10-25, PC-003: arabski go, patrz D6) ·
 > D7: B (due+zapas, domyślnie 100/talia) · D8: A+C · D9: B (liczniki+dziś+streak) ·
 > D10: B (fr965 na start) · D11: sideload w dev, Store później, APK przez /sforna ·
 > D12: garmanki (robocza).
@@ -179,6 +179,23 @@ Karty Anki to HTML. Companion będzie je spłaszczał do tekstu.
 taliach — powiedz, zaplanuję font od razu w architekturze zasobów.
 
 ➤ DECYZJA:
+
+> **Aktualizacja 2026-10-25 (PC-003, spike na Forerunner 965).** Założenie
+> „wbudowane fonty nie narysują" okazało się za szerokie. Zmierzone na
+> zegarku (sondy w scratchpadzie, wynik w TASK-31 i PC-003):
+>
+> - **Arabski bez harakatów** — litery łączą się i idą RTL poprawnie,
+>   także wbudowanym fontem. **Z harakatami** zapis logiczny rozsypuje
+>   litery; formy prezentacyjne + harakat wyglądają poprawnie → decyzja
+>   „go", kształtowanie po stronie companiona (TASK-35).
+> - **Greka nowożytna** (z tonos) — działa. **Polytoniczna** (blok Greek
+>   Extended, znaki łączące U+0313/0314/0342/0345) — kwadraciki; wymaga
+>   własnego fontu (TASK-36).
+> - **Łacińska transliteracja** w postaci złożonej (ā ī ū ḥ ṣ ḍ ṭ ẓ …) —
+>   działa; część rzadkich liter (ǫ ɛ ɔ ʃ ḯ ṻ ḗ ṓ) i stosy znaków łączących
+>   — nie.
+> - Zastrzeżenie: sprawdzone tylko na Forerunner 965; FR165 i tactix 8
+>   niezweryfikowane.
 
 ## D7. Zakres synchronizacji talii
 

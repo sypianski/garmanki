@@ -4,22 +4,24 @@ slug: arabski-shaping-harakat-rtl-na-zegarku-czy-i-kto
 data: 2026-10-25
 typ: inne
 proponent: agent
-status: do-rozstrzygnięcia
+status: przyjęta
 projekt: garmanki
 tytul: "Arabski (shaping, harakat, RTL) na zegarku: czy i którym wariantem"
-decyzja: "(nierozstrzygnięta)"
-dlaczego: ""
+decyzja: "Arabski: go — companion zamienia litery na formy prezentacyjne, gdy tekst ma harakat, plus normalizacja NFC i limit w bajtach; font własny (greka polytoniczna, rzadkie litery łacińskie) rozpatrywany osobno"
+dlaczego: "Spike na fr965 (sondy ar–ar4, 2026-10-25) pokazał, że firmware sam łączy litery i obsługuje RTL, nawet wbudowanym fontem; psują się tylko harakat, a formy prezentacyjne z harakatami wyglądają poprawnie, więc wystarczy zmiana po stronie companiona bez nowego fontu. Odrzucone: pre-render obrazków (BLE ~100x więcej), własny font dla arabskiego (niepotrzebny), no-go (arabski bez harakatów działa już dziś). Zastrzeżenie: sprawdzone tylko na Forerunner 965; FR165 i tactix 8 niezweryfikowane. Greka polytoniczna i rzadkie litery łacińskie dają kwadraciki — osobny research fontu."
 decyduje: "Jakub (user)"
 rekomendacja: "Go warunkowo: 1-godzinny spike na prawdziwym fr965 (sonda .prg rysuje Unicode logiczny i formy prezentacyjne fontem FONT_MEDIUM i NotoNaskhArabicRegular), potem C; jeśli glifów brak lub harakat nieczytelne — D"
 zalezy: "TASK-31 AC#3, D6 w DECYZJE.md, spike na zegarku fr965, ewentualne tikety implementacyjne"
 tagi: [zegarek, companion, i18n, arabski, rtl]
 zastepuje: null
-osiadlo: ""
+osiadlo: "Do potwierdzenia na FR165/tactix 8 po wdrożeniu; ekran 8 spike'u (łacina z osobnymi znakami łączącymi) niezweryfikowany."
 tiket: TASK-31
+rozstrzygnieta: 2026-10-25
+rozstrzygnal: wspólnie
 ---
 # PC-003 · Arabski (shaping, harakat, RTL) na zegarku: czy i którym wariantem
 
-**Status.** do rozstrzygnięcia (otwarta 2026-10-25); decyduje: Jakub (user). Research: [TASK-31](../backlog/tasks/task-31%20-%20Research-czy-da-si%C4%99-obs%C5%82u%C5%BCy%C4%87-arabski-kszta%C5%82towanie-liter-harakat-RTL-na-zegarku.md). D6 w DECYZJE.md pozostaje bez zmian do czasu rozstrzygnięcia.
+**Status.** rozstrzygnięta (patrz niżej); była: do rozstrzygnięcia (otwarta 2026-10-25); decyduje: Jakub (user). Research: [TASK-31](../backlog/tasks/task-31%20-%20Research-czy-da-si%C4%99-obs%C5%82u%C5%BCy%C4%87-arabski-kszta%C5%82towanie-liter-harakat-RTL-na-zegarku.md). D6 w DECYZJE.md pozostaje bez zmian do czasu rozstrzygnięcia.
 
 **Pytanie / kontekst.** Dwa zgłoszenia w dwa miesiące (Forerunner 165 i tactix 8; nauka arabskiego z harakatami). D6 zakłada, że arabski „praktycznie odpada”: wbudowane fonty Garmina go nie narysują, nie ma kształtowania liter ani RTL. Research sprawdził, czy to nadal prawda i ile kosztowałoby obejście.
 
@@ -118,3 +120,11 @@ Odrzucone jako pierwszy krok: **A**, bo koszt BLE rośnie ~100× i trzeba przero
 ## Powiązane tikiety
 
 - [TASK-31](../backlog/tasks/task-31%20-%20Research-czy-da-si%C4%99-obs%C5%82u%C5%BCy%C4%87-arabski-kszta%C5%82towanie-liter-harakat-RTL-na-zegarku.md)
+
+## Rozstrzygnięcie (2026-10-25)
+
+**Decyzja.** Arabski: go — companion zamienia litery na formy prezentacyjne, gdy tekst ma harakat, plus normalizacja NFC i limit w bajtach; font własny (greka polytoniczna, rzadkie litery łacińskie) rozpatrywany osobno
+
+**Uzasadnienie.** Spike na fr965 (sondy ar–ar4, 2026-10-25) pokazał, że firmware sam łączy litery i obsługuje RTL, nawet wbudowanym fontem; psują się tylko harakat, a formy prezentacyjne z harakatami wyglądają poprawnie, więc wystarczy zmiana po stronie companiona bez nowego fontu. Odrzucone: pre-render obrazków (BLE ~100x więcej), własny font dla arabskiego (niepotrzebny), no-go (arabski bez harakatów działa już dziś). Zastrzeżenie: sprawdzone tylko na Forerunner 965; FR165 i tactix 8 niezweryfikowane. Greka polytoniczna i rzadkie litery łacińskie dają kwadraciki — osobny research fontu.
+
+**Gdzie osiadło.** Do potwierdzenia na FR165/tactix 8 po wdrożeniu; ekran 8 spike'u (łacina z osobnymi znakami łączącymi) niezweryfikowany.

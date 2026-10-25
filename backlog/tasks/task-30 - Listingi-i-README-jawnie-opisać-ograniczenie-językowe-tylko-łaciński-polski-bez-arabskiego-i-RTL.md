@@ -7,7 +7,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-25 10:12'
-updated_date: '2026-10-25 11:33'
+updated_date: '2026-10-25 18:29'
 labels: []
 dependencies: []
 references:
@@ -38,4 +38,6 @@ Dwóch użytkowników Connect IQ (27 VII: Forerunner 165; 15 IX: tactix 8) zgło
 Powiązane: TASK-33 (ekran bez danych na zegarku) — komunikat na zegarku i listing powinny mówić to samo o wymaganiach (Android + companion + AnkiDroid).
 
 2026-10-25 /decidu: user zdecydował czekać z wysyłką tekstów do sklepów (Play i Connect IQ) na wynik spike'u arabskiego (TASK-31 / PC-003). Szkice w notatkach zostają jako gotowe. README już wypchnięty (origin/master 1889216).
+
+2026-10-25 PO SPIKU ARABSKIEGO (PC-003): szkice z wcześniejszej notatki są NIEAKTUALNE (twierdziły, że arabski/greka nie działają). Nowe szkice (czekają na zgodę usera, nic nie wysłano): PLAY_EN (259 zn.): Latin script incl. Polish, modern Greek and plain Arabic work; Arabic vowel marks (harakat), polytonic Greek and some rare Latin letters are not supported yet. Tested on Forerunner 965. Needs an Android phone with the Garmanki companion and AnkiDroid; no iOS. | PLAY_PL (272 zn.): Działa pismo łacińskie (z polskim), nowogrecki i zwykły arabski; znaki samogłoskowe arabskiego (harakat), greka polytoniczna i część rzadkich liter łacińskich jeszcze nie. Sprawdzone na Forerunner 965. Wymaga telefonu z Androidem, aplikacji Garmanki i AnkiDroid; brak iOS. | CIQ_EN (373 zn.): Limitations & requirements: shows Latin-script text (including Polish), modern Greek and plain Arabic. Not yet supported: Arabic vowel marks (harakat), polytonic Greek, some rare Latin letters and CJK. Tested on the Forerunner 965 only. Requires an Android phone with the Garmanki companion app and AnkiDroid; there is no iOS version. Without them the watch shows no cards. Po wdrożeniu TASK-35 zdanie o harakat do usunięcia.
 <!-- SECTION:NOTES:END -->

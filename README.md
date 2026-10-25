@@ -53,10 +53,14 @@ Plain fēnix 6 / 6S (128 KB app RAM) are **not** supported yet.
 
 - Text only: no images or audio on the watch; cloze deletions show as
   `[...]`.
-- Latin script only (including Polish). Greek, Arabic (including
-  harakat and right-to-left text) and CJK are **not** supported: the
-  built-in Garmin fonts cannot draw them. There is no decision or
-  timeline; Arabic feasibility is being researched.
+- Latin script (including Polish) is what the app is built and tested
+  for. In a test on a Forerunner 965, Arabic letters were drawn joined
+  and right-to-left, but vowel marks (harakat) break the joining and
+  insert gaps between letters; other watches and the full card flow
+  have not been verified. Modern Greek and precomposed Latin diacritics
+  (ā ḥ ṣ ḍ ṭ ẓ …) display correctly there; polytonic Greek breathings,
+  circumflex and iota subscript, and some rarer Latin letters
+  (ǫ ɛ ɔ ʃ), show as placeholder boxes. CJK has not been tested. There is no decision or timeline for official support.
 - Needs an Android phone with the Garmanki companion and AnkiDroid:
   without them the watch has no cards to show (it displays "No data").
 - Android only: there is no iOS companion. Its feasibility is being

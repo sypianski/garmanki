@@ -58,8 +58,11 @@ cd android && ./gradlew assembleRelease lint testDebugUnitTest
   `watch/manifest.xml` AND `android/…/ciq/*` — keep in sync.
 - Anki ids travel as **strings** (64-bit epoch-ms; Monkey C Number is
   32-bit) — never parse them to Int on the watch.
-- v1 is Latin/Polish text only (D6): built-in Garmin fonts, no Greek/
-  Arabic/CJK. Companion must strip HTML per SCHEMA.md §6.
+- Built-in Garmin fonts (Roboto) cover Latin/Polish, modern Greek and plain
+  Arabic (joins, RTL — measured on fr965, D6 update / PC-003). Not covered:
+  Arabic harakat unless shaped to presentation forms in the companion
+  (TASK-35), polytonic Greek and rare Latin letters (TASK-36), CJK. Combining
+  marks are unreliable — send NFC. Companion must strip HTML per SCHEMA.md §6.
 - Deleting from the watch is a soft delete (suspend + tag
   `garmanki-delete`) — never hard-delete notes from the companion.
 
