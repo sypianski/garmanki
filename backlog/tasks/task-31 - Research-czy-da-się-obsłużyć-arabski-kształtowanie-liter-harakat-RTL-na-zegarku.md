@@ -7,7 +7,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-25 10:12'
-updated_date: '2026-10-25 10:49'
+updated_date: '2026-10-25 11:33'
 labels: []
 dependencies: []
 references:
@@ -36,4 +36,6 @@ Powtarzający się temat zgłoszeń (2 osoby w 2 miesiące). D6 mówi, że arabs
 Research zrobiony, wynik w PC-003 (otwarta, decyduje user). Kluczowy fakt: 20/45 modeli z manifestu (w tym fr165, fenix847mm/fenix8solar51mm = tactix 8, fr965) ma systemowy font wektorowy NotoNaskhArabic (simulator.json); getVectorFont od API 4.2.1. Shaping/bidi firmware NIEzweryfikowane — symulator na Macu segfaultuje przy rysowaniu fontem wektorowym (pusty katalog Fonts), na VPS nie startuje (brak libexpat). Rekomendacja: 1h spike na prawdziwym fr965, potem wariant C albo no-go. D6 nie zmieniony; AC#3 czeka na decyzję usera.
 
 Weryfikacja dyrygenta 2026-10-25: git status — poza PC-003 i plikami backlogu brak zmian (DECYZJE.md, watch/, android/, SCHEMA.md nietknięte); brak danych osobowych w PC-003; NotoNaskhArabic obecny w simulator.json 20 z 45 produktów z manifestu (m.in. fr165, fr265, fr965, fenix8) — potwierdzone grepem. AC3 OTWARTE: decyzja PC-003 czeka na usera (rekomendacja: go warunkowo — 1-godzinny spike na prawdziwym fr965, potem wariant C z fontem systemowym albo no-go); po rozstrzygnięciu zamknąć PC przez pc.py choose i zaktualizować D6. Nie zweryfikowane bez zegarka: shaping i bidi w firmware, pozycja harakat, przepustowość BLE. Drobiazg: CLAUDE.md mówi o 73 wariantach sprzętowych, manifest ma 45 product id.
+
+2026-10-25 /decidu: user wybrał spike na prawdziwym fr965 (sonda .prg z Noto Naskh Arabic); PC-003 zostaje otwarta do wyniku testu. Sonda do ponownego użycia: scratchpad artest/ (nie w repo).
 <!-- SECTION:NOTES:END -->
