@@ -31,8 +31,8 @@ android {
         applicationId = "dev.sypianski.garmanki"
         minSdk = 26
         targetSdk = 36
-        versionCode = 14
-        versionName = "1.0.4"
+        versionCode = 15
+        versionName = "1.0.5"
     }
 
     buildTypes {
