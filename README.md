@@ -17,7 +17,7 @@ Publicly released:
 
 - **Android companion** (v1.0.4) —
   [Google Play](https://play.google.com/store/apps/details?id=dev.sypianski.garmanki)
-- **Watch app** (v1.2.3) —
+- **Watch app** (v1.3.0) —
   [Connect IQ Store](https://apps.garmin.com/apps/f3cb31bc-f5d9-4818-b730-4c67e98e3b7a)
 
 garmanki is an independent project, not affiliated with Anki, AnkiDroid
@@ -53,14 +53,15 @@ Plain fēnix 6 / 6S (128 KB app RAM) are **not** supported yet.
 
 - Text only: no images or audio on the watch; cloze deletions show as
   `[...]`.
-- Latin script (including Polish) is what the app is built and tested
-  for. In a test on a Forerunner 965, Arabic letters were drawn joined
-  and right-to-left, but vowel marks (harakat) break the joining and
-  insert gaps between letters; other watches and the full card flow
-  have not been verified. Modern Greek and precomposed Latin diacritics
-  (ā ḥ ṣ ḍ ṭ ẓ …) display correctly there; polytonic Greek breathings,
-  circumflex and iota subscript, and some rarer Latin letters
-  (ǫ ɛ ɔ ʃ), show as placeholder boxes. CJK has not been tested. There is no decision or timeline for official support.
+- Latin script (including Polish) is what the app is built for. Tested
+  on a Forerunner 965 only: Arabic is drawn joined and right-to-left,
+  and since companion 1.0.5 vowel marks (harakat) display correctly too
+  (the companion converts the letters to presentation forms before
+  sending). Modern Greek and precomposed Latin diacritics
+  (ā ḥ ṣ ḍ ṭ ẓ …) display correctly; the companion composes combining
+  marks. Polytonic Greek and some rarer Latin letters (ǫ ɛ ɔ ʃ) show as
+  placeholder boxes, and lam-alef is drawn as two letters instead of a
+  ligature. CJK has not been tested; other watches have not been verified.
 - Needs an Android phone with the Garmanki companion and AnkiDroid:
   without them the watch has no cards to show (it displays "No data").
 - Android only: there is no iOS companion. Its feasibility is being

@@ -7,7 +7,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-25 10:12'
-updated_date: '2026-10-25 18:29'
+updated_date: '2026-10-25 21:04'
 labels: []
 dependencies: []
 references:
@@ -24,10 +24,10 @@ Dwóch użytkowników Connect IQ (27 VII: Forerunner 165; 15 IX: tactix 8) zgło
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Opis w Connect IQ Store zawiera zdanie o obsłudze tylko tekstu łacińskiego/polskiego i braku arabskiego, greki, CJK
-- [ ] #2 Opis w Google Play zawiera to samo ograniczenie (en-US i pl-PL, jeśli oba są w listingu)
+- [x] #1 Opis w Connect IQ Store zawiera zdanie o obsłudze tylko tekstu łacińskiego/polskiego i braku arabskiego, greki, CJK
+- [x] #2 Opis w Google Play zawiera to samo ograniczenie (en-US i pl-PL, jeśli oba są w listingu)
 - [ ] #3 README i strona aplikacji (TASK-23) mają sekcję Limitations spójną z listingami
-- [ ] #4 Zmiany w listingach wysłane dopiero po potwierdzeniu usera (Publish Gate)
+- [x] #4 Zmiany w listingach wysłane dopiero po potwierdzeniu usera (Publish Gate)
 <!-- AC:END -->
 
 ## Implementation Notes
@@ -40,4 +40,6 @@ Powiązane: TASK-33 (ekran bez danych na zegarku) — komunikat na zegarku i lis
 2026-10-25 /decidu: user zdecydował czekać z wysyłką tekstów do sklepów (Play i Connect IQ) na wynik spike'u arabskiego (TASK-31 / PC-003). Szkice w notatkach zostają jako gotowe. README już wypchnięty (origin/master 1889216).
 
 2026-10-25 PO SPIKU ARABSKIEGO (PC-003): szkice z wcześniejszej notatki są NIEAKTUALNE (twierdziły, że arabski/greka nie działają). Nowe szkice (czekają na zgodę usera, nic nie wysłano): PLAY_EN (259 zn.): Latin script incl. Polish, modern Greek and plain Arabic work; Arabic vowel marks (harakat), polytonic Greek and some rare Latin letters are not supported yet. Tested on Forerunner 965. Needs an Android phone with the Garmanki companion and AnkiDroid; no iOS. | PLAY_PL (272 zn.): Działa pismo łacińskie (z polskim), nowogrecki i zwykły arabski; znaki samogłoskowe arabskiego (harakat), greka polytoniczna i część rzadkich liter łacińskich jeszcze nie. Sprawdzone na Forerunner 965. Wymaga telefonu z Androidem, aplikacji Garmanki i AnkiDroid; brak iOS. | CIQ_EN (373 zn.): Limitations & requirements: shows Latin-script text (including Polish), modern Greek and plain Arabic. Not yet supported: Arabic vowel marks (harakat), polytonic Greek, some rare Latin letters and CJK. Tested on the Forerunner 965 only. Requires an Android phone with the Garmanki companion app and AnkiDroid; there is no iOS version. Without them the watch shows no cards. Po wdrożeniu TASK-35 zdanie o harakat do usunięcia.
+
+2026-10-25 (po zgodzie usera na konkretne teksty): Play en-US fullDescription — podmieniona linijka NOTES ('v1 supports Latin and Polish...' -> 'Text support: ... harakat need app version 1.0.5 or newer ...'), zweryfikowane odczytem API; w Play istnieje tylko listing en-US (pl-PL brak, nie dodawany). Connect IQ: akapit 'Limitations & requirements' dopisany na koncu opisu przez /edit (1023 zn.), zapis potwierdzony ponownym otwarciem formularza; strona publiczna pokaze po zatwierdzeniu Garmina. Poza zakresem, zauwazone: opis CIQ nadal mowi 'companion app (Android) (open-source, side-loaded)' choć companion jest w Play; kategoria w formularzu = 202 (profil garminiq: 213). AC3 otwarte: README zaktualizowane, strona apki (TASK-23) nie istnieje.
 <!-- SECTION:NOTES:END -->
