@@ -7,7 +7,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-25 18:28'
-updated_date: '2026-10-25 20:46'
+updated_date: '2026-10-25 20:52'
 labels:
   - companion
 dependencies: []
@@ -31,7 +31,7 @@ Wynik spike'u PC-003 na fr965: zwykły arabski łączy się i idzie RTL poprawni
 - [x] #3 Znaki łączące w łacinie (np. a + makron) są składane do znaków złożonych po stronie companiona; test jednostkowy z kilkoma przykładami
 - [x] #4 Limit długości pola liczony w bajtach UTF-8; SCHEMA.md §2 i §5 oraz StatePayload.kt zaktualizowane, protocolVersion podbity jeśli kontrakt się zmienia
 - [ ] #5 Szczyt pamięci zegarka z kartami o maksymalnej długości w bajtach zmierzony i mieści się w limicie najsłabszych wspieranych modeli
-- [ ] #6 Wersja podbita przy wydaniu wg Version Bump
+- [x] #6 Wersja podbita przy wydaniu wg Version Bump
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -48,4 +48,6 @@ Spike: łacina z osobnymi znakami łączącymi (ekran 8) pozostaje niezweryfikow
 Wdrożone 2026-10-25: ArabicShaper.kt, HtmlToText (NFC, shaping, MAX_BYTES=600), StatePayload (budżet paczki w bajtach UTF-8, MAX_CHUNK_BYTES), SCHEMA §2/§6. testDebugUnitTest 47/0 błędów, assembleDebug i lint OK. AC2: test 'plain arabic without harakat is untouched'. AC3: test NFC (a+U+0304 itd.). AC4: limit 300 zn. ORAZ 600 B; protocolVersion BEZ zmiany (watch nie parsuje tekstu, kształt rekordu §2 ten sam). AC5 (rozumowanie, nie pomiar): najgorszy przypadek pola = 600 B = dzisiejszy najgorszy (300 zn. x 2 B polskie/arabskie), więc RAM zegarka nie rośnie; pomiar na urządzeniu zostaje. AC1 czeka na zdjęcie z fr965 (potrzebny APK z tą zmianą na telefonie). Bez ligatur lam-alef i bez liter perskich spoza U+0621-064A.
 
 AC1: test na fr965 przez HiBreak (companion 1.0.5 + talia testowa z 7 kartami: H1-H3 z harakat, P1-P2 bez, N1 znaki laczace, L1 polski). Potwierdzone slownie przez usera 2026-10-25: 'harakat na zegarku dziala perfekcyjnie'. Brak zdjecia w ~/dumpado; P1/P2 (AC2 na urzadzeniu), N1 (NFC na urzadzeniu) i H3 (szadda) nie zostaly jeszcze osobno potwierdzone. Zegarek: wersja Garmanki nieustalona (sklep: 1.2.3 live, 1.3.0 zlozona 23 X); nie byla aktualizowana, zmiana jest tylko w companionie.
+
+2026-10-25: companion 1.0.5 (versionCode 15) wgrany do Play na tor production, 100%, status completed (play_upload.py check potwierdza). Wersja podbita w android/app/build.gradle.kts (76bad1e). Oczekuje na przeglad Google. README (Status: v1.0.4) do aktualizacji po akceptacji. AC5 (pomiar RAM na zegarku) nadal otwarte.
 <!-- SECTION:NOTES:END -->
