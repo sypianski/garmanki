@@ -6,6 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-10-25 18:28'
+updated_date: '2026-10-25 18:36'
 labels:
   - companion
 dependencies: []
@@ -31,3 +32,9 @@ Wynik spike'u PC-003 na fr965: zwykły arabski łączy się i idzie RTL poprawni
 - [ ] #5 Szczyt pamięci zegarka z kartami o maksymalnej długości w bajtach zmierzony i mieści się w limicie najsłabszych wspieranych modeli
 - [ ] #6 Wersja podbita przy wydaniu wg Version Bump
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Spike: łacina z osobnymi znakami łączącymi (ekran 8) pozostaje niezweryfikowana (nieostre zdjęcie, ponowne odpuszczone 2026-10-25) — dlatego companion normalizuje do NFC.
+<!-- SECTION:NOTES:END -->

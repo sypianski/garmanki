@@ -194,6 +194,9 @@ taliach — powiedz, zaplanuję font od razu w architekturze zasobów.
 > - **Łacińska transliteracja** w postaci złożonej (ā ī ū ḥ ṣ ḍ ṭ ẓ …) —
 >   działa; część rzadkich liter (ǫ ɛ ɔ ʃ ḯ ṻ ḗ ṓ) i stosy znaków łączących
 >   — nie.
+> - **Łacina z osobnymi znakami łączącymi** (np. a + U+0304) — nierozstrzygnięte:
+>   zdjęcie ekranu było nieostre, a ponowne zdjęcie odpuszczono (2026-10-25).
+>   Nie ma to wpływu na decyzję: companion i tak wysyła NFC (formy złożone).
 > - Zastrzeżenie: sprawdzone tylko na Forerunner 965; FR165 i tactix 8
 >   niezweryfikowane.
 
