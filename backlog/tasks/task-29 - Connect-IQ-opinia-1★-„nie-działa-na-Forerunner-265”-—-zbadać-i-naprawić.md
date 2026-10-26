@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-25 10:12'
-updated_date: '2026-10-25 10:33'
+updated_date: '2026-10-26 12:26'
 labels: []
 dependencies: []
 references:
@@ -50,4 +50,6 @@ AC3 pamięć: compiler.json watchApp memoryLimit: fr265 = fr265s = 786432 B (768
 AC4: błąd niereprodukowalny dla fr265 jako urządzenia. Najbardziej prawdopodobne: brak/nieskonfigurowany companion (iPhone, brak APK/AnkiDroid/uprawnienia) -> zegarek pokazuje HomeNoData „No data — open the Garmanki app on your phone” = „nie działa”. Druga, słabsza hipoteza: OOM przy synchronizacji dużej talii (jak venu3; ten sam limit 768 KB), ale w symulatorze najgorszy przypadek mieści się z zapasem ~368 KB. Bez zmiany kodu -> bez bumpa wersji. Follow-up: odpowiedź na opinię z prośbą o szczegóły (TASK-32), jasne wymagania w listingu (TASK-30).
 
 Weryfikacja dyrygenta 2026-10-25: git status bez zmian w śledzonych plikach (kodu nie ruszano); era_reports.json potwierdza 1 raport OOM = venu3, brak fr265/fr265s; memoryLimit fr265=fr265s=fr165=fr965=venu3=786432 B odczytane z compiler.json. AC2 otwarte: brakuje ręcznego przejścia lista talii -> sesja -> ocena na fr265/fr265s (symulator lub prawdziwy zegarek). Follow-up (do decyzji usera): OOM na venu3 w CardStore.replaceAll (v1.2.2); komunikat HomeNoData mógłby mówić o wymaganiu Androida i AnkiDroid.
+
+2026-10-26: opinia (Karol Sapiński, 1★) dotyczy wersji 1.3.0 z 24 X, nie 1.2.x — redesign z TASK-28 nie jest wykluczony; AC2 (ręczne przejście lista talii → sesja → ocena na fr265) nadal otwarte. W panelu Connect IQ istnieje 'Reply to Review' (publiczna, bez edycji po publikacji, limit 2000 zn.). Opublikowano odpowiedź po polsku (375 zn.: wymagania Android + companion + AnkiDroid, prośba o model telefonu i opis na dev@sypian.ski) — zweryfikowana na stronie sklepu po przeładowaniu. Byline odpowiedzi pokazuje 'Karol Sapiński' zamiast nazwy dewelopera (prawdopodobnie quirk UI Garmina).
 <!-- SECTION:NOTES:END -->
