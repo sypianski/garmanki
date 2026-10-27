@@ -250,12 +250,15 @@ class OnboardingView extends WatchUi.View {
 
 class OnboardingDelegate extends WatchUi.BehaviorDelegate {
 
-    function initialize() {
+    private var _onboarding as OnboardingView;
+
+    function initialize(onboarding as OnboardingView) {
         BehaviorDelegate.initialize();
+        _onboarding = onboarding;
     }
 
     private function _view() as OnboardingView {
-        return WatchUi.getCurrentView()[0] as OnboardingView;
+        return _onboarding;
     }
 
     function onSelect() as Boolean {

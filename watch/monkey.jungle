@@ -3,6 +3,8 @@ project.manifest = manifest.xml
 # Default profile: five buttons + AMOLED (fr9xx, epix2, fenix8 AMOLED,
 # marq2, fr2x5 AMOLED, fr165, instinct3 AMOLED, fenixe, fr570).
 base.sourcePath = source;source-profile/fivebtn-amoled
+# Compat.mc: API 3.4 path (:modern) everywhere except API 3.3 devices (TASK-38).
+base.excludeAnnotations = legacy
 
 # Touch-first AMOLED (2 right-side buttons, no UP/DOWN pair).
 venu2.sourcePath = source;source-profile/touch-amoled
@@ -35,3 +37,10 @@ fr255m.sourcePath = source;source-profile/fivebtn-mip
 fr255s.sourcePath = source;source-profile/fivebtn-mip
 fr255sm.sourcePath = source;source-profile/fivebtn-mip
 fr955.sourcePath = source;source-profile/fivebtn-mip
+
+# Touch + 64-color MIP, Connect IQ 3.3 — no ActionMenu/showToast, so the
+# :legacy shims in Compat.mc replace the :modern path (TASK-38).
+vivoactive4.sourcePath = source;source-profile/touch-mip
+vivoactive4.excludeAnnotations = modern
+vivoactive4s.sourcePath = source;source-profile/touch-mip
+vivoactive4s.excludeAnnotations = modern

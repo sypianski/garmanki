@@ -399,15 +399,12 @@ class ReviewView extends WatchUi.View {
     function openMenu() as Void {
         var card = _cur;
         var nt = card[6] as Array;
-        var menu = new WatchUi.ActionMenu({});
-        var items = 0;
+        var items = [];
         var easeStrs = [Rez.Strings.EaseAgain, Rez.Strings.EaseHard,
                         Rez.Strings.EaseGood, Rez.Strings.EaseEasy];
         for (var ease = 1; ease <= 4; ease++) {
             if (!ActionMap.isMapped(ease)) {
-                menu.addItem(new WatchUi.ActionMenuItem(
-                    {:label => _gradeLabel(easeStrs[ease - 1], nt, ease - 1)}, ease));
-                items++;
+                items.add([_gradeLabel(easeStrs[ease - 1], nt, ease - 1), ease]);
             }
         }
         var enabled = Storage.getValue("cardActions");
@@ -418,14 +415,12 @@ class ReviewView extends WatchUi.View {
             if (enabled instanceof Array && enabled.indexOf(codes[k]) < 0) {
                 continue;
             }
-            menu.addItem(new WatchUi.ActionMenuItem(
-                {:label => WatchUi.loadResource(labels[k]) as String}, 11 + k));
-            items++;
+            items.add([WatchUi.loadResource(labels[k]) as String, 11 + k]);
         }
-        if (items == 0) {
+        if (items.size() == 0) {
             return; // everything mapped + all card actions disabled
         }
-        WatchUi.showActionMenu(menu, new ReviewMenuDelegate(self));
+        Compat.showMenu(items, self);
     }
 
     private function _gradeLabel(strId, nt as Array, idx as Number) as String {
@@ -480,7 +475,7 @@ class ReviewView extends WatchUi.View {
         var card = _cur;
         CardStore.queueRow(["x", card[0], card[1], card[2], code]);
         if ("flag".equals(code)) {
-            WatchUi.showToast(Rez.Strings.Flagged, null);
+            Compat.toast(Rez.Strings.Flagged);
             return; // flag keeps the card on screen (D4)
         }
         _advance();
@@ -524,12 +519,15 @@ class ReviewView extends WatchUi.View {
 
 class ReviewDelegate extends WatchUi.BehaviorDelegate {
 
-    function initialize() {
+    private var _review as ReviewView;
+
+    function initialize(review as ReviewView) {
         BehaviorDelegate.initialize();
+        _review = review;
     }
 
     private function _view() as ReviewView {
-        return WatchUi.getCurrentView()[0] as ReviewView;
+        return _review;
     }
 
     // Any grade key reveals first; once revealed it grades per ActionMap.
@@ -606,22 +604,5 @@ class ReviewDelegate extends WatchUi.BehaviorDelegate {
     function onBack() as Boolean {
         _view().endSession(false);
         return true;
-    }
-}
-
-class ReviewMenuDelegate extends WatchUi.ActionMenuDelegate {
-
-    private var _review as ReviewView;
-
-    function initialize(review as ReviewView) {
-        ActionMenuDelegate.initialize();
-        _review = review;
-    }
-
-    function onSelect(item as WatchUi.ActionMenuItem) as Void {
-        _review.handleMenu(item.getId());
-    }
-
-    function onBack() as Void {
     }
 }

@@ -24,7 +24,8 @@ class GarmankiApp extends Application.AppBase {
         // First run: show the guide (GAR-03); it stamps the flag and
         // switches to HomeView itself.
         if (Storage.getValue("onboardingSeen") != true) {
-            return [new OnboardingView(true), new OnboardingDelegate()];
+            var guide = new OnboardingView(true);
+            return [guide, new OnboardingDelegate(guide)];
         }
         return [new HomeView(), new HomeDelegate()];
     }

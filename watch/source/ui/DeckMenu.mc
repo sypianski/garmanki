@@ -41,8 +41,8 @@ class DeckMenuDelegate extends WatchUi.Menu2InputDelegate {
             return;
         }
         if ("guide".equals(deckIdx)) {
-            WatchUi.pushView(new OnboardingView(false), new OnboardingDelegate(),
-                WatchUi.SLIDE_LEFT);
+            var guide = new OnboardingView(false);
+            WatchUi.pushView(guide, new OnboardingDelegate(guide), WatchUi.SLIDE_LEFT);
             return;
         }
         if (!(deckIdx instanceof Number)) {
@@ -50,7 +50,7 @@ class DeckMenuDelegate extends WatchUi.Menu2InputDelegate {
         }
         var cards = CardStore.cardsForDeck(deckIdx);
         if (cards.size() == 0) {
-            WatchUi.showToast(Rez.Strings.DeckEmpty, null);
+            Compat.toast(Rez.Strings.DeckEmpty);
             return;
         }
         var decks = CardStore.getDecks();
@@ -60,8 +60,8 @@ class DeckMenuDelegate extends WatchUi.Menu2InputDelegate {
                 name = decks[i][2];
             }
         }
-        WatchUi.pushView(new ReviewView(cards, name),
-            new ReviewDelegate(), WatchUi.SLIDE_LEFT);
+        var review = new ReviewView(cards, name);
+        WatchUi.pushView(review, new ReviewDelegate(review), WatchUi.SLIDE_LEFT);
     }
 
     function onBack() as Void {

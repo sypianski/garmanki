@@ -28,12 +28,12 @@ or Garmin.
 - An Android phone (Android 8+) with **AnkiDroid** and **Garmin Connect**
   installed on the same phone.
 - A supported Garmin watch (below). Most models need Connect IQ 4.2.1+;
-  the fēnix 6 Pro-class watches run API 3.4.
+  the fēnix 6 Pro-class watches run API 3.4, vívoactive 4 / 4S API 3.3.
 
 ## Supported watches
 
-Tested **only on the Forerunner 965**. The app is built for 45 watch
-models (73 hardware variants, counted by Garmin part number); the other
+Tested **only on the Forerunner 965**. The app is built for 47 watch
+models (77 hardware variants, counted by Garmin part number); the other
 models compile but have not been checked on real hardware.
 
 - **Forerunner** — 165 / 165 Music, 255 / 255s (and Music), 265 / 265s,
@@ -42,7 +42,7 @@ models compile but have not been checked on real hardware.
   Dual Power), 7 / 7S / 7X (and Pro), 8 (43 / 47 / 51 mm, incl. Solar), E
 - **epix** — epix (Gen 2); epix Pro (Gen 2) 42 / 47 / 51 mm
 - **Venu** — 2 / 2S / 2 Plus, 3 / 3S, 4 (41 / 45 mm)
-- **vívoactive** — 5, 6
+- **vívoactive** — 4 / 4S, 5, 6
 - **MARQ** — MARQ (Gen 2); MARQ Aviator (Gen 2)
 - **Enduro** — 3
 - **Instinct** — 3 AMOLED (45 / 50 mm)
@@ -71,7 +71,7 @@ Plain fēnix 6 / 6S (128 KB app RAM) are **not** supported yet.
 
 | Dir | What | Stack |
 |---|---|---|
-| `watch/` | Connect IQ app (45 models / 73 hw variants incl. fenix6 Pro-class; minApiLevel 3.4.0) | Monkey C, SDK 9.x |
+| `watch/` | Connect IQ app (47 models / 77 hw variants incl. fenix6 Pro-class, vivoactive4; minApiLevel 3.3.0) | Monkey C, SDK 9.x |
 | `android/` | companion — AnkiDroid bridge + BLE push | Kotlin, Compose M3, CIQ Mobile SDK 2.4.0 |
 
 See [SCHEMA.md](SCHEMA.md) for the watch↔phone data contract and

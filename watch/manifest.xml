@@ -5,7 +5,7 @@
                     launcherIcon="@Drawables.LauncherIcon"
                     name="@Strings.AppName"
                     type="watch-app"
-                    minApiLevel="3.4.0">
+                    minApiLevel="3.3.0">
         <iq:products>
             <!-- AMOLED 454x454 -->
             <iq:product id="fr965"/>
@@ -33,6 +33,8 @@
             <iq:product id="marq2aviator"/>
             <iq:product id="venu3s"/>
             <iq:product id="venu441mm"/>
+            <iq:product id="vivoactive4"/>
+            <iq:product id="vivoactive4s"/>
             <iq:product id="vivoactive5"/>
             <iq:product id="vivoactive6"/>
             <iq:product id="instinct3amoled45mm"/>

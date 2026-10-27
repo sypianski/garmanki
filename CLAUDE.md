@@ -14,7 +14,7 @@ Architecture patterns are deliberately mirrored from
 
 | Dir | What | Stack |
 |---|---|---|
-| `watch/` | Connect IQ app (73 hw variants incl. fenix6 Pro-class; minApiLevel 3.4.0) | Monkey C, SDK 9.x |
+| `watch/` | Connect IQ app (77 hw variants incl. fenix6 Pro-class, vivoactive4; minApiLevel 3.3.0) | Monkey C, SDK 9.x |
 | `android/` | companion — AnkiDroid bridge + BLE push | Kotlin, Compose M3, CIQ Mobile SDK 2.4.0 |
 
 ## Commands
@@ -39,6 +39,8 @@ cd android && ./gradlew assembleRelease lint testDebugUnitTest
   Keep the store version >= `AppVersion` when releasing.
   1.3.0 (TASK-28, watch redesign) submitted via /update on 2026-10-23; the
   public page showed Version 1.3.0 (status Preview) on 2026-10-25.
+  1.3.1 (TASK-38, vivoactive4/4s) submitted via /update on 2026-10-27
+  (PUT 204), before the fr965 regression check — pending Garmin approval.
   Listing description edited via /edit on 2026-10-25 (Limitations paragraph,
   TASK-30); the public page shows it only after Garmin approves.
   1.2.3 (TASK-26) adds fenix6pro/6spro/6xpro; submitted and live the same
@@ -57,6 +59,11 @@ cd android && ./gradlew assembleRelease lint testDebugUnitTest
 - `watch/developer_key` and `android/keystore.properties` are gitignored.
 - Watch app UUID `b1b0cef8a5b246af9c8ea2951c2d6bba` appears in
   `watch/manifest.xml` AND `android/…/ciq/*` — keep in sync.
+- `minApiLevel` is 3.3.0 (vivoactive4/4s), but ActionMenu, showToast and
+  getCurrentView are API 3.4 — monkeyc does NOT flag symbols above a device's
+  API level. 3.4-only calls live in `source/ui/Compat.mc` as `(:modern)`;
+  API 3.3 devices get `(:legacy)` via `excludeAnnotations` in monkey.jungle.
+  Check "Since: API Level" in the SDK docs for any new Toybox call.
 - Anki ids travel as **strings** (64-bit epoch-ms; Monkey C Number is
   32-bit) — never parse them to Int on the watch.
 - Built-in Garmin fonts (Roboto) cover Latin/Polish, modern Greek and plain
