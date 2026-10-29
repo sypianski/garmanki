@@ -4,7 +4,7 @@ title: 'Zegarek: BACK w powtórce otwiera Opcje (Cofnij, akcje karty, Zakończ s
 status: In Progress
 assignee: []
 created_date: '2026-10-29 16:55'
-updated_date: '2026-10-29 18:39'
+updated_date: '2026-10-29 18:56'
 labels: []
 dependencies: []
 priority: high
@@ -39,4 +39,6 @@ Zgłoszenie usera z testu na fr965 (2026-10-29): w powtórce brakuje przycisku c
 2026-10-29: na prośbę usera akcje karty widoczne też na talii przykładowej; _action dla DemoDeck robi snapshot bez wiersza i nie kolejkuje (susp/bury/del zdejmują kartę z sesji, flag = toast). Kryterium #1 w części 'poza talią przykładową' nieaktualne.
 
 2026-10-29: user przeklikał na fr965 (talia przykładowa): Opcje pod BACK, hold UP, Cofnij, wyjście z podsumowania — OK. AC#3 (cofanie z wierszem w q na prawdziwej talii) nie było testowane wprost.
+
+2026-10-29: wysłane w 1.3.2 do Connect IQ (czeka na zatwierdzenie Garmina).
 <!-- SECTION:NOTES:END -->

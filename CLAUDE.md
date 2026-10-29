@@ -42,6 +42,13 @@ cd android && ./gradlew assembleRelease lint testDebugUnitTest
   1.3.1 (TASK-38, vivoactive4/4s) submitted via /update on 2026-10-27
   (PUT 204), before the fr965 regression check; live by 2026-10-29 (public
   API: latestExternalVersion 1.3.1, vivoactive4/4s part numbers listed).
+  1.3.2 (TASK-39/40/41/43/44: Options under BACK with Undo, gestures,
+  sample deck, What's new screen, no lost answers after restart) submitted
+  via /update on 2026-10-29 together with the new cover image (TASK-42,
+  icon variant B); /update shows "Latest app version: 1.3.2", pending
+  Garmin approval. Export the .iq on the Mac WITHOUT `-r` — release mode
+  crashes monkeyc 9.2 ("Generating code for unsupported operation 'null'"),
+  also on 1.3.1 code.
   Listing description edited via /edit on 2026-10-25 (Limitations paragraph,
   TASK-30); the public page shows it only after Garmin approves.
   1.2.3 (TASK-26) adds fenix6pro/6spro/6xpro; submitted and live the same

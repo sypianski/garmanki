@@ -6,7 +6,7 @@ title: >-
 status: In Progress
 assignee: []
 created_date: '2026-10-29 18:24'
-updated_date: '2026-10-29 18:39'
+updated_date: '2026-10-29 18:56'
 labels:
   - watch
   - ux
@@ -43,4 +43,6 @@ Projekt notatki do #app-whats-new-en (czeka na akceptację usera):
 - Fix: answers could be lost if the app closed before the phone confirmed them.
 
 2026-10-29: user zaakceptował notatkę do What's New.
+
+2026-10-29: wysłane w 1.3.2 do Connect IQ (czeka na zatwierdzenie Garmina).
 <!-- SECTION:NOTES:END -->
