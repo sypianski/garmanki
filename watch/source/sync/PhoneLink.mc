@@ -94,6 +94,12 @@ class PhoneLink {
         }
     }
 
+    // Rows at the head of the queue that belong to the batch in flight —
+    // they must not be dropped locally (review undo, TASK-41).
+    function inFlightCount() as Number {
+        return _sentBatch != null ? _sentCount as Number : CardStore.sentCount();
+    }
+
     function flush() as Void {
         var now = System.getTimer();
         var q = CardStore.rows();
@@ -107,7 +113,11 @@ class PhoneLink {
             if (q.size() == 0) {
                 return;
             }
-            count = q.size();
+            // A batch left unacked by an earlier run keeps its rows (TASK-43).
+            count = CardStore.sentCount();
+            if (count == 0) {
+                count = q.size();
+            }
         }
         if (count > q.size()) { // defensive; should not happen
             count = q.size();
@@ -125,6 +135,7 @@ class PhoneLink {
         _sentBatch = CardStore.currentBatch();
         _sentCount = count;
         _sentMs = now;
+        CardStore.setSent(count);
         _tx({"p" => 1, "t" => "a", "batch" => _sentBatch, "ans" => ans, "act" => act});
     }
 
@@ -135,6 +146,7 @@ class PhoneLink {
         }
         if (d["ok"] == true) {
             CardStore.dropFirst(_sentCount);
+            CardStore.setSent(0);
             CardStore.bumpBatch();
             // Successful answer delivery is a sync event too — otherwise the
             // home line shows "Not synced yet" for users whose only traffic is

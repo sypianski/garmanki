@@ -30,6 +30,7 @@ module Theme {
     // Non-button bezel positions used as status indicators (drawn only when
     // there's something to say — a silent bezel means "everything's fine").
     const ANG_LINK  = DeviceProfile.ANG_LINK;
+    const ANG_BACK  = DeviceProfile.ANG_BACK;
 
     // Scale a pixel measure designed on the 454x454 reference (fr965) to
     // the current display, rounded, never below 1 px.

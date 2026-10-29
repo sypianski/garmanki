@@ -130,6 +130,28 @@ module CardStore {
         Storage.setValue("lastSync", epochSec);
     }
 
+    // Undo of the last answer/action (TASK-41): drop the tail row only if it
+    // is still that row and not part of the batch in flight. Compared via
+    // toString — a Storage roundtrip may turn Number into Long.
+    function dropLastIf(row as Array, inFlight as Number) as Boolean {
+        var q = rows();
+        var n = q.size();
+        if (n <= inFlight) {
+            return false;
+        }
+        var last = q[n - 1] as Array;
+        if (last.size() != row.size()) {
+            return false;
+        }
+        for (var i = 0; i < row.size(); i++) {
+            if (!(last[i] as Object).toString().equals((row[i] as Object).toString())) {
+                return false;
+            }
+        }
+        Storage.setValue("q", q.slice(0, n - 1) as Array<Storage.ValueType>);
+        return true;
+    }
+
     function dropFirst(n as Number) as Void {
         var q = rows();
         Storage.setValue("q", n >= q.size() ? [] : q.slice(n, null));
@@ -144,5 +166,26 @@ module CardStore {
 
     function bumpBatch() as Void {
         Storage.setValue("batch", currentBatch() + 1);
+    }
+
+    // Rows frozen into the current batch, persisted so a resend after an app
+    // restart carries exactly the same rows under the same id (TASK-43): the
+    // companion re-acks a known batch without applying it, so extra rows in
+    // it would be dropped unseen. 0 = nothing sent yet.
+    function sentCount() as Number {
+        var s = Storage.getValue("sent");
+        if (s instanceof Array && s.size() == 2 && currentBatch().equals(s[0])) {
+            var n = s[1];
+            return n instanceof Number ? n : 0;
+        }
+        return 0;
+    }
+
+    function setSent(count as Number) as Void {
+        if (count > 0) {
+            Storage.setValue("sent", [currentBatch(), count]);
+        } else {
+            Storage.deleteValue("sent");
+        }
     }
 }

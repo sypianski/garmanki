@@ -97,11 +97,19 @@ fresh state rev.
 | `cards_n` | Int — number of `cards_<i>` keys |
 | `q` | Array of queued rows: `["a",…ans row]` / `["x",…act row]` |
 | `batch` | Int — last batch id assigned |
+| `sent` | `[batch, count]` — the first `count` rows of `q` frozen into unacked `batch`; a resend (also after an app restart) carries exactly these rows, later rows wait for the next batch (TASK-43) |
 | `actionMap` | Dictionary — event→ease overrides, §8 `am` stored verbatim |
 | `cardActions` | Array — enabled card actions, §8 `ca` stored verbatim |
 | `guideReset` | Int — last §8 `gr` value seen |
 | `tickMode` | Int — §8 `tm` (0 color, 1 +interval, 2 +word), absent = 1 |
 | `onboardingSeen` | Bool — first-run guide already shown (GAR-03) |
+| `demoRemoved` | Bool — user removed the built-in sample deck (TASK-40) |
+| `newsSeen` | String — `WhatsNew.NOTES_ID` of the last "What's new" screen shown or skipped by the guide (TASK-44) |
+
+The built-in sample deck (20 Esperanto → English cards, `DemoDeck.mc`)
+is not part of the pushed state: deck index `-1`, card ids `"demo<i>"`,
+never stored under `cards_<i>`, and its answers / card actions are never
+queued in `q` — the companion never sees it.
 
 Caps: 8 decks × 100 cards default (companion setting), hard cap 400
 cards total on watch; storage value limit is 32 KB/key.

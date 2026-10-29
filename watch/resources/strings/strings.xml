@@ -1,7 +1,7 @@
 <strings>
     <string id="AppName">Garmanki</string>
     <!-- Keep in sync with the version entered in the Connect IQ Store form. -->
-    <string id="AppVersion">1.3.1</string>
+    <string id="AppVersion">1.3.2</string>
 
     <!-- Plural forms: one / few (2-4, not 12-14) / many. See HomeView._decksWord. -->
     <string id="HomeDeckOne">deck</string>
@@ -16,6 +16,10 @@
 
     <string id="MenuDecksTitle">Decks</string>
     <string id="DeckEmpty">Done for today</string>
+    <string id="DemoDeckName">Esperanto</string>
+    <string id="DemoDeckSub">Sample · 20 words</string>
+    <string id="DemoRemove">Remove sample deck</string>
+    <string id="DemoRemoveAsk">Remove the sample deck?</string>
 
     <!-- Grade words, used by the onboarding guide (GAR-03). -->
     <string id="WordAgain">again</string>
@@ -30,9 +34,19 @@
     <string id="GuideT3">Touch</string>
     <string id="GuideT4">More</string>
     <string id="Guide1">Any button or a tap reveals the answer</string>
-    <string id="Guide2">Buttons grade the card</string>
-    <string id="Guide4">Hold UP for suspend, bury, flag, delete. BACK ends the session.</string>
+    <string id="Guide2">Press each button</string>
+    <string id="Guide3">Try each gesture</string>
+    <string id="Undo">Undo</string>
+    <string id="EndSession">End session</string>
+    <string id="UndoSynced">Already synced</string>
+    <string id="WhatsNew">What's new</string>
+    <string id="News1">BACK: options and undo</string>
+    <string id="News2">Quick exit after a session</string>
+    <string id="News3">Sample Esperanto deck</string>
+    <string id="News4">Better taps and swipes</string>
+    <string id="Guide4">BACK: undo, suspend, bury, flag, delete, end session.</string>
     <string id="GuideDone">START to finish</string>
+    <string id="GuideNext">START to continue</string>
     <string id="HomeStreak">day streak</string>
     <string id="HomeStreakOne">day streak</string>
 

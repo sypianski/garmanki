@@ -13,6 +13,9 @@
 
     <string id="MenuDecksTitle">Talie</string>
     <string id="DeckEmpty">Na dziś koniec</string>
+    <string id="DemoDeckSub">Przykład · 20 słów</string>
+    <string id="DemoRemove">Usuń talię przykładową</string>
+    <string id="DemoRemoveAsk">Usunąć talię przykładową?</string>
 
     <string id="WordAgain">znów</string>
     <string id="WordHard">trudne</string>
@@ -25,9 +28,19 @@
     <string id="GuideT3">Dotyk</string>
     <string id="GuideT4">Więcej</string>
     <string id="Guide1">Dowolny przycisk albo dotknięcie odsłania odpowiedź</string>
-    <string id="Guide2">Przyciski oceniają kartę</string>
-    <string id="Guide4">Przytrzymaj UP: zawieś, odłóż, oflaguj, usuń. BACK kończy sesję.</string>
+    <string id="Guide2">Naciśnij każdy przycisk</string>
+    <string id="Guide3">Wypróbuj każdy gest</string>
+    <string id="Undo">Cofnij</string>
+    <string id="EndSession">Zakończ sesję</string>
+    <string id="UndoSynced">Już wysłane</string>
+    <string id="WhatsNew">Co nowego</string>
+    <string id="News1">BACK: opcje i cofnij</string>
+    <string id="News2">Szybkie wyjście po sesji</string>
+    <string id="News3">Talia przykładowa</string>
+    <string id="News4">Lepszy dotyk i gesty</string>
+    <string id="Guide4">BACK: cofnij, zawieś, odłóż, oflaguj, usuń, zakończ sesję.</string>
     <string id="GuideDone">START, by zakończyć</string>
+    <string id="GuideNext">START, by przejść dalej</string>
     <string id="HomeStreak">dni z rzędu</string>
     <string id="HomeStreakOne">dzień z rzędu</string>
 

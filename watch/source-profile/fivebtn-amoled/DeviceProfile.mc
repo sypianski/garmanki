@@ -9,10 +9,14 @@ module DeviceProfile {
     // geometry as fr965 (degrees, 0 = 3 o'clock, CCW positive).
     const HAS_UPDOWN_BUTTONS = true;
     const ANG_START = 30;
-    const ANG_UP    = 150;
+    // UP sits at 9 o'clock on every five-button model (SDK simulator.json:
+    // fr965/fr265/fr255/fenix7/fenix6pro/epix2 up=180, down=210); 150 is the
+    // LIGHT button, which never reaches the app (TASK-39).
+    const ANG_UP    = 180;
     const ANG_DOWN  = 210;
     // Non-button bezel position used as a status indicator.
-    const ANG_LINK  = 180; // 9 o'clock: phone link health warning
+    const ANG_LINK  = 90; // 12 o'clock, no button: phone link health warning
+    const ANG_BACK  = 330; // bottom-right BACK: review options (TASK-41)
 
     // "Companion" palette — cool grays on true black, pastel grades shared with
     // the Android app (TASK-28.2). Full 24-bit color on AMOLED.

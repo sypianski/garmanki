@@ -238,20 +238,21 @@ class HomeView extends WatchUi.View {
     }
 }
 
-class HomeDelegate extends WatchUi.BehaviorDelegate {
+class HomeDelegate extends GestureDelegate {
 
     function initialize() {
-        BehaviorDelegate.initialize();
+        GestureDelegate.initialize();
     }
 
-    function onSelect() as Boolean {
-        DeckMenu.push();
-        return true;
+    function onInput(event as String) as Void {
+        if ("start".equals(event) || "tap".equals(event)) {
+            DeckMenu.push();
+        }
     }
 
-    function onMenu() as Boolean {
+    // Manual sync.
+    function onHoldUp() as Void {
         Link.get().hello();
         Link.get().setStatus(WatchUi.loadResource(Rez.Strings.SyncSent) as String);
-        return true;
     }
 }

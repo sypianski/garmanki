@@ -11,7 +11,7 @@ import Toybox.Attention;
 //
 // Card record (SCHEMA.md §2): [cid, nid, ord, deckIdx, front, back, [nt1..nt4]]
 // Keys (D13/D14, mapping configurable via ActionMap): any grade key reveals;
-// then defaults UP=Easy, DOWN=Good, START=Again; hold UP (onMenu) = action
+// then defaults UP=Easy, DOWN=Good, START=Again; BACK or hold UP = Options
 // menu: card actions plus only the grades no button/gesture reaches (GAR-06). Touch (D15/D16): tap reveals, then tap=Good; swipes
 // →Good ←Again ↑Easy ↓Hard, also via ActionMap.
 //
@@ -43,6 +43,11 @@ class ReviewView extends WatchUi.View {
     // a sitting — treated as end-of-session via learn-ahead.
     private const SESSION_LONG = 5400000;
     private const DEFAULT_STEP = 60000; // fallback when nt1 is empty/unknown
+    // Undo depth per sitting (TASK-41).
+    private const UNDO_MAX = 10;
+    // Options menu ids beside grades (1-4) and card actions (11-14).
+    private const MENU_UNDO = 20;
+    private const MENU_END = 21;
 
     private var _new as Array;          // unseen cards, cursor _ni
     private var _ni as Number = 0;
@@ -55,6 +60,8 @@ class ReviewView extends WatchUi.View {
     private var _counts as Array = [0, 0, 0, 0]; // grades given this sitting: Again, Hard, Good, Easy
     private var _startMs as Number;
     private var _cardStartMs as Number;
+    // Undo stack: [cur, curStep, ni, learn, done, counts, queuedRow or null].
+    private var _history as Array = [];
 
     function initialize(cards as Array, deckName as String) {
         View.initialize();
@@ -231,6 +238,8 @@ class ReviewView extends WatchUi.View {
         dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 6 / 100, Graphics.FONT_XTINY, counter,
             Graphics.TEXT_JUSTIFY_CENTER);
+        // BACK opens the options menu (TASK-41).
+        Theme.tick(dc, Theme.ANG_BACK, Theme.MUTED);
         if (_curStep > 0 && !_showAnswer) {
             // This card was failed earlier in the sitting and came back.
             _drawRepeatMark(dc,
@@ -396,14 +405,21 @@ class ReviewView extends WatchUi.View {
     // Grades reachable via a button or gesture stay out of the menu (GAR-06);
     // card actions are filtered by the companion-pushed "cardActions" list
     // (SCHEMA.md §8) — absent list means all four.
+    // Options (BACK or hold UP, TASK-41): Undo first, End session last.
     function openMenu() as Void {
         var card = _cur;
+        if (card == null) {
+            return;
+        }
         var nt = card[6] as Array;
         var items = [];
+        if (_history.size() > 0) {
+            items.add([WatchUi.loadResource(Rez.Strings.Undo) as String, MENU_UNDO]);
+        }
         var easeStrs = [Rez.Strings.EaseAgain, Rez.Strings.EaseHard,
                         Rez.Strings.EaseGood, Rez.Strings.EaseEasy];
         for (var ease = 1; ease <= 4; ease++) {
-            if (!ActionMap.isMapped(ease)) {
+            if (_showAnswer && !ActionMap.isMapped(ease)) {
                 items.add([_gradeLabel(easeStrs[ease - 1], nt, ease - 1), ease]);
             }
         }
@@ -417,9 +433,7 @@ class ReviewView extends WatchUi.View {
             }
             items.add([WatchUi.loadResource(labels[k]) as String, 11 + k]);
         }
-        if (items.size() == 0) {
-            return; // everything mapped + all card actions disabled
-        }
+        items.add([WatchUi.loadResource(Rez.Strings.EndSession) as String, MENU_END]);
         Compat.showMenu(items, self);
     }
 
@@ -434,7 +448,11 @@ class ReviewView extends WatchUi.View {
 
     function handleMenu(id) as Void {
         if (id instanceof Number) {
-            if (id >= 1 && id <= 4) {
+            if (id == MENU_UNDO) {
+                undo();
+            } else if (id == MENU_END) {
+                endSession(false);
+            } else if (id >= 1 && id <= 4) {
                 grade(id);
             } else if (id == 11) {
                 _action("susp");
@@ -455,7 +473,12 @@ class ReviewView extends WatchUi.View {
         if (timeMs > 60000) {
             timeMs = 60000;
         }
-        CardStore.queueRow(["a", card[0], card[1], card[2], ease, timeMs, Time.now().value()]);
+        var row = ["a", card[0], card[1], card[2], ease, timeMs, Time.now().value()];
+        // Sample-deck answers stay on the watch (TASK-40).
+        _snapshot(DemoDeck.isDemo(card as Array) ? null : row);
+        if (!DemoDeck.isDemo(card as Array)) {
+            CardStore.queueRow(row);
+        }
         _done++;
         _counts[ease - 1] = (_counts[ease - 1] as Number) + 1;
         // "Again" → back into the learning queue with a due timestamp derived
@@ -473,12 +496,55 @@ class ReviewView extends WatchUi.View {
 
     private function _action(code as String) as Void {
         var card = _cur;
-        CardStore.queueRow(["x", card[0], card[1], card[2], code]);
+        var row = ["x", card[0], card[1], card[2], code];
+        // On the sample deck an action only affects this sitting (TASK-40).
+        if (DemoDeck.isDemo(card as Array)) {
+            _snapshot(null);
+        } else {
+            _snapshot(row);
+            CardStore.queueRow(row);
+        }
         if ("flag".equals(code)) {
             Compat.toast(Rez.Strings.Flagged);
             return; // flag keeps the card on screen (D4)
         }
         _advance();
+    }
+
+    // State before an answer/action, for undo. `row` = what went into q.
+    private function _snapshot(row as Array?) as Void {
+        _history.add([_cur, _curStep, _ni, _learn.slice(0, null), _done,
+            _counts.slice(0, null), row]);
+        if (_history.size() > UNDO_MAX) {
+            _history = _history.slice(1, null);
+        }
+    }
+
+    // Back to the previous card. A row the phone already has (or that is in
+    // flight) can't be taken back — AnkiDroid's API has no undo.
+    function undo() as Void {
+        var n = _history.size();
+        if (n == 0) {
+            return;
+        }
+        var e = _history[n - 1] as Array;
+        var row = e[6];
+        if (row != null
+                && !CardStore.dropLastIf(row as Array, Link.get().inFlightCount())) {
+            _history = [];
+            Compat.toast(Rez.Strings.UndoSynced);
+            return;
+        }
+        _history = _history.slice(0, n - 1);
+        _cur = e[0];
+        _curStep = e[1] as Number;
+        _ni = e[2] as Number;
+        _learn = e[3] as Array;
+        _done = e[4] as Number;
+        _counts = e[5] as Array;
+        _showAnswer = false;
+        _cardStartMs = System.getTimer();
+        WatchUi.requestUpdate();
     }
 
     private function _advance() as Void {
@@ -517,92 +583,34 @@ class ReviewView extends WatchUi.View {
     }
 }
 
-class ReviewDelegate extends WatchUi.BehaviorDelegate {
+class ReviewDelegate extends GestureDelegate {
 
     private var _review as ReviewView;
 
     function initialize(review as ReviewView) {
-        BehaviorDelegate.initialize();
+        GestureDelegate.initialize();
         _review = review;
     }
 
-    private function _view() as ReviewView {
-        return _review;
-    }
-
-    // Any grade key reveals first; once revealed it grades per ActionMap.
-    private function _key(event as String) as Boolean {
-        var v = _view();
-        if (!v.isRevealed()) {
-            v.reveal();
-            return true;
+    // Any input reveals first; once revealed it grades per ActionMap.
+    function onInput(event as String) as Void {
+        if (!_review.isRevealed()) {
+            _review.reveal();
+            return;
         }
         var ease = ActionMap.easeFor(event);
         if (ease != null) {
-            v.grade(ease);
+            _review.grade(ease);
         }
-        return true;
     }
 
-    function onSelect() as Boolean { // START
-        return _key("start");
-    }
-
-    function onPreviousPage() as Boolean { // UP
-        return _key("up");
-    }
-
-    function onNextPage() as Boolean { // DOWN
-        return _key("down");
-    }
-
-    function onMenu() as Boolean { // hold UP
-        var v = _view();
-        if (v.isRevealed()) {
-            v.openMenu();
-        } else {
-            v.reveal();
-        }
-        return true;
-    }
-
-    function onTap(clickEvent as WatchUi.ClickEvent) as Boolean {
-        return _key("tap");
-    }
-
-    // Unmapped directions fall through (return false) so the system keeps
-    // its own gesture; a mapped SWIPE_RIGHT returns true, which on fr965
-    // should pre-empt the system back-swipe — needs on-device confirmation.
-    function onSwipe(swipeEvent as WatchUi.SwipeEvent) as Boolean {
-        var dir = swipeEvent.getDirection();
-        var event = null;
-        if (dir == WatchUi.SWIPE_RIGHT) {
-            event = "swipeR";
-        } else if (dir == WatchUi.SWIPE_LEFT) {
-            event = "swipeL";
-        } else if (dir == WatchUi.SWIPE_UP) {
-            event = "swipeU";
-        } else if (dir == WatchUi.SWIPE_DOWN) {
-            event = "swipeD";
-        }
-        if (event == null) {
-            return false;
-        }
-        var v = _view();
-        if (!v.isRevealed()) {
-            v.reveal();
-            return true;
-        }
-        var ease = ActionMap.easeFor(event);
-        if (ease == null) {
-            return false;
-        }
-        v.grade(ease);
-        return true;
+    // BACK and hold UP both open Options; End session lives there (TASK-41).
+    function onHoldUp() as Void {
+        _review.openMenu();
     }
 
     function onBack() as Boolean {
-        _view().endSession(false);
+        _review.openMenu();
         return true;
     }
 }

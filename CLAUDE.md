@@ -40,7 +40,8 @@ cd android && ./gradlew assembleRelease lint testDebugUnitTest
   1.3.0 (TASK-28, watch redesign) submitted via /update on 2026-10-23; the
   public page showed Version 1.3.0 (status Preview) on 2026-10-25.
   1.3.1 (TASK-38, vivoactive4/4s) submitted via /update on 2026-10-27
-  (PUT 204), before the fr965 regression check — pending Garmin approval.
+  (PUT 204), before the fr965 regression check; live by 2026-10-29 (public
+  API: latestExternalVersion 1.3.1, vivoactive4/4s part numbers listed).
   Listing description edited via /edit on 2026-10-25 (Limitations paragraph,
   TASK-30); the public page shows it only after Garmin approves.
   1.2.3 (TASK-26) adds fenix6pro/6spro/6xpro; submitted and live the same

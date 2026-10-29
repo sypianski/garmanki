@@ -27,6 +27,9 @@ class GarmankiApp extends Application.AppBase {
             var guide = new OnboardingView(true);
             return [guide, new OnboardingDelegate(guide)];
         }
+        if (WhatsNew.pending()) {
+            return [new WhatsNewView(), new WhatsNewDelegate()];
+        }
         return [new HomeView(), new HomeDelegate()];
     }
 }

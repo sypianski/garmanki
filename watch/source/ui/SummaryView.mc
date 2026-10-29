@@ -1,10 +1,12 @@
 import Toybox.Lang;
 import Toybox.Graphics;
+import Toybox.System;
 import Toybox.WatchUi;
 
 // Session close: a full accent ring (the day's loop closed), hero count,
 // quiet metadata and four bars with the grades given (Again, Hard, Good, Easy,
 // in that fixed order, so it reads without color). Nothing shouting.
+// START goes back to the deck list, BACK straight to the watch face (TASK-41).
 class SummaryView extends WatchUi.View {
 
     private var _done as Number;
@@ -26,6 +28,8 @@ class SummaryView extends WatchUi.View {
         var cx = w / 2;
 
         Theme.ring(dc, cx - 12, 1.0);
+        Theme.tick(dc, Theme.ANG_START, Theme.PAPER);
+        Theme.tick(dc, Theme.ANG_BACK, Theme.MUTED);
 
         dc.setColor(Theme.MUTED, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 16 / 100, Graphics.FONT_XTINY,
@@ -109,8 +113,10 @@ class SummaryDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
+    // Answers are already in q (endSession flushed); an interrupted send
+    // is retried on the next hello.
     function onBack() as Boolean {
-        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+        System.exit();
         return true;
     }
 }

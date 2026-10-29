@@ -12,6 +12,7 @@ module DeviceProfile {
     const ANG_UP    = 150;
     const ANG_DOWN  = 210;
     const ANG_LINK  = 180;
+    const ANG_BACK  = 330; // bottom-right BACK: review options (TASK-41)
 
     // "Companion" palette — cool grays on true black, pastel grades shared with
     // the Android app (TASK-28.2). Full 24-bit color on AMOLED.
