@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- garmanki: warstwa monochromatyczna (Android 13+ themed icons). Liczy się tylko alfa:
+       góra tarczy pełna, dół 55%, "?" i "✓" wycięte maską. -->
+  <defs>
+    <mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="192" height="192">
+      <rect width="192" height="192" fill="#fff"/>
+      <path d="M83 62 C83 49 109 49 109 62 C109 71 96 71 96 79" fill="none" stroke="#000" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="96" cy="88" r="4.2" fill="#000"/>
+      <path d="M79 122 L92 135 L114 110" fill="none" stroke="#000" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <g mask="url(#cut)" fill="#000">
+    <path d="M42 94 A54 54 0 0 1 150 94 Z"/>
+    <path d="M42 98 A54 54 0 0 0 150 98 Z" fill-opacity=".55"/>
+  </g>
+</svg>
